@@ -10,15 +10,39 @@ import BenefitSection from '@/components/BenefitSection';
 import LogSection from '@/components/LogSection';
 import PartnerBenefitModal from '@/components/PartnerBenefitModal';
 import CourseSaveModal from '@/components/CourseSaveModal';
+import LoginModal from '@/components/LoginModal';
+import CharacterCreateModal from '@/components/CharacterCreateModal';
+import LevelUpRewardModal from '@/components/LevelUpRewardModal';
+import CharacterWidget from '@/components/CharacterWidget';
 
-import { AppMode, LocationPoint, Workspace, TimeAttackCourse, TourSpot, PartnerBenefit } from '@/types';
+import {
+  AppMode,
+  LocationPoint,
+  Workspace,
+  TimeAttackCourse,
+  TourSpot,
+  PartnerBenefit,
+  UserMember,
+  CharacterProfile,
+  LevelRewardOption,
+} from '@/types';
 import { BUSAN_HUBS, INITIAL_WORKSPACES, SEED_COURSES, PARTNER_BENEFITS } from '@/lib/busanData';
+import { LEVEL_REQUIREMENTS } from '@/lib/characterData';
 
 export default function Home() {
   const [currentMode, setCurrentMode] = useState<AppMode>('WALK'); // 기본 모드는 30분 코스
   const [selectedHub, setSelectedHub] = useState<LocationPoint>(BUSAN_HUBS[0]); // 영도 거점
   const [offTime, setOffTime] = useState<string>('18:00');
   const [isRainy, setIsRainy] = useState<boolean>(false);
+
+  // 회원 정보 및 SD 캐릭터 상태
+  const [currentUser, setCurrentUser] = useState<UserMember | null>(null);
+  const [character, setCharacter] = useState<CharacterProfile | null>(null);
+
+  // 모달 제어 상태
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
+  const [isCharacterCreateOpen, setIsCharacterCreateOpen] = useState<boolean>(false);
+  const [levelUpTarget, setLevelUpTarget] = useState<number | null>(null);
 
   // 워크스페이스 데이터 및 시트 연동 상태
   const [workspaces, setWorkspaces] = useState<Workspace[]>(INITIAL_WORKSPACES);
@@ -33,6 +57,53 @@ export default function Home() {
   // 모달 상태
   const [activeBenefit, setActiveBenefit] = useState<PartnerBenefit | null>(null);
   const [isSaveModalOpen, setIsSaveModalOpen] = useState<boolean>(false);
+
+  // 포인트 적립 및 레벨업 감지 함수
+  const earnPoints = async (amount: number, reason: string) => {
+    if (!character) return;
+
+    const newPoints = character.points + amount;
+    let nextLevel = character.level;
+
+    // 레벨업 조건 체크 (Lv.1 -> Lv.2: 200P, Lv.2 -> Lv.3: 500P, Lv.3 -> Lv.4: 900P)
+    if (character.level === 1 && newPoints >= LEVEL_REQUIREMENTS[2]) {
+      nextLevel = 2;
+    } else if (character.level === 2 && newPoints >= LEVEL_REQUIREMENTS[3]) {
+      nextLevel = 3;
+    } else if (character.level === 3 && newPoints >= LEVEL_REQUIREMENTS[4]) {
+      nextLevel = 4;
+    }
+
+    const updatedChar: CharacterProfile = {
+      ...character,
+      points: newPoints,
+      level: nextLevel,
+    };
+    setCharacter(updatedChar);
+
+    // 구글 시트 Point_Logs 탭에 실시간 기록
+    if (currentUser) {
+      fetch('/api/sheet', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'point',
+          email: currentUser.email,
+          name: currentUser.name,
+          reason,
+          earnedPoints: `+${amount}P`,
+          totalPoints: newPoints,
+          level: `Lv.${nextLevel}`,
+          equipped: updatedChar.equipped.headwear || '기본',
+        }),
+      }).catch((e) => console.warn('Point sheet sync skipped:', e));
+    }
+
+    // 레벨업 발생 시 보상 선택 모달 오픈
+    if (nextLevel > character.level) {
+      setLevelUpTarget(nextLevel);
+    }
+  };
 
   // 구글 시트에서 워크스페이스 목록 가져오기
   useEffect(() => {
@@ -88,9 +159,34 @@ export default function Home() {
     loadTourCourse(selectedHub, nextRainy);
   };
 
+  // 로그인 성공 시 캐릭터 생성 플로우로 전환
+  const handleLoginSuccess = (user: UserMember) => {
+    setCurrentUser(user);
+    setIsLoginModalOpen(false);
+    // 최초 캐릭터 생성을 위해 모달 오픈
+    setIsCharacterCreateOpen(true);
+  };
+
+  // 캐릭터 생성 완료 핸들러
+  const handleCharacterCreated = (newChar: CharacterProfile) => {
+    setCharacter(newChar);
+    setIsCharacterCreateOpen(false);
+  };
+
+  // 레벨업 보상(모자/의상/악세사리 3종 택 1) 선택 완료 핸들러
+  const handleRewardSelected = (reward: LevelRewardOption) => {
+    if (!character) return;
+    const newEquipped = { ...character.equipped, [reward.category]: reward.name };
+    setCharacter({
+      ...character,
+      equipped: newEquipped,
+    });
+    setLevelUpTarget(null);
+  };
+
   return (
     <main className="flex flex-col min-h-screen pb-20">
-      {/* 1. 상단 헤더 (타이틀, 퇴근 카운트다운 타이머, 날씨 위젯, 거점 선택기) */}
+      {/* 1. 상단 헤더 (타이틀, 퇴근 카운트다운 타이머, 날씨 위젯, 로그인 버튼, 거점 선택기) */}
       <Header
         selectedHub={selectedHub}
         onSelectHub={handleSelectHub}
@@ -98,6 +194,16 @@ export default function Home() {
         onOffTimeChange={setOffTime}
         isRainy={isRainy}
         onToggleWeather={handleToggleWeather}
+        user={currentUser}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
+      />
+
+      {/* 1-1. SD 동물 캐릭터 육성 위젯 (레벨, 성장 포인트, 착용 아이템) */}
+      <CharacterWidget
+        user={currentUser}
+        character={character}
+        onOpenLogin={() => setIsLoginModalOpen(true)}
+        onTriggerLevelUpModal={(lvl) => setLevelUpTarget(lvl)}
       />
 
       {/* 2. 인터랙티브 지도 (카카오맵 연동 + 하이브리드 동선 캔버스) */}
@@ -109,6 +215,7 @@ export default function Home() {
         onSelectWorkspace={(ws) => {
           setSelectedWorkspace(ws);
           setCurrentMode('WORK');
+          earnPoints(50, `[${ws.name}] 워크스페이스 체크인`);
         }}
         activeCourse={activeCourse}
         selectedSpot={selectedSpot}
@@ -126,7 +233,10 @@ export default function Home() {
           <WorkSection
             workspaces={workspaces}
             selectedWorkspace={selectedWorkspace}
-            onSelectWorkspace={setSelectedWorkspace}
+            onSelectWorkspace={(ws) => {
+              setSelectedWorkspace(ws);
+              earnPoints(50, `[${ws.name}] 워크스페이스 체크인`);
+            }}
             isFromGoogle={isFromGoogleSheet}
           />
         )}
@@ -137,7 +247,10 @@ export default function Home() {
             selectedSpot={selectedSpot}
             onSelectSpot={setSelectedSpot}
             onRefreshCourse={() => loadTourCourse(selectedHub, isRainy)}
-            onOpenBenefitModal={setActiveBenefit}
+            onOpenBenefitModal={(b) => {
+              setActiveBenefit(b);
+              earnPoints(80, `[${b.businessName}] 제휴 쿠폰 열람/발급`);
+            }}
             onOpenSaveModal={() => setIsSaveModalOpen(true)}
             isRainy={isRainy}
             onToggleWeather={handleToggleWeather}
@@ -146,7 +259,12 @@ export default function Home() {
         )}
 
         {currentMode === 'BENEFIT' && (
-          <BenefitSection onSelectBenefit={setActiveBenefit} />
+          <BenefitSection
+            onSelectBenefit={(b) => {
+              setActiveBenefit(b);
+              earnPoints(80, `[${b.businessName}] 제휴 쿠폰 열람/발급`);
+            }}
+          />
         )}
 
         {currentMode === 'MYLOG' && (
@@ -164,18 +282,48 @@ export default function Home() {
         couponCount={PARTNER_BENEFITS.length}
       />
 
-      {/* 5. 부산 기업 상생 모바일 할인권 모달 */}
+      {/* 5. 로그인 & 회원가입 모달 (간편로그인 3종 + 5대 정보 + 보안책임자 고지) */}
+      <LoginModal
+        isOpen={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        onLoginSuccess={handleLoginSuccess}
+      />
+
+      {/* 6. SD 동물 캐릭터 최초 1회 생성 모달 */}
+      {currentUser && (
+        <CharacterCreateModal
+          user={currentUser}
+          isOpen={isCharacterCreateOpen}
+          onCharacterCreated={handleCharacterCreated}
+        />
+      )}
+
+      {/* 7. 레벨업 보상 선택 모달 (동일 카테고리 3종 중 택 1) */}
+      {currentUser && character && levelUpTarget && (
+        <LevelUpRewardModal
+          user={currentUser}
+          character={character}
+          targetLevel={levelUpTarget}
+          isOpen={levelUpTarget !== null}
+          onRewardSelected={handleRewardSelected}
+        />
+      )}
+
+      {/* 8. 부산 기업 상생 모바일 할인권 모달 */}
       <PartnerBenefitModal
         benefit={activeBenefit}
         onClose={() => setActiveBenefit(null)}
       />
 
-      {/* 6. 구글 시트 코스 & 방명록 저장 모달 */}
+      {/* 9. 구글 시트 코스 & 방명록 저장 모달 */}
       {isSaveModalOpen && (
         <CourseSaveModal
           course={activeCourse}
           workspace={selectedWorkspace}
-          onClose={() => setIsSaveModalOpen(false)}
+          onClose={() => {
+            setIsSaveModalOpen(false);
+            earnPoints(120, `[${activeCourse.title}] 코스 완주 및 방명록 저장`);
+          }}
         />
       )}
     </main>

@@ -98,3 +98,43 @@ export interface WorkationLog {
   reviewComment: string;
   rating: number;
 }
+
+// 회원 가입 및 로그인 사용자 정보
+export interface UserMember {
+  id: string;
+  createdAt: string;
+  provider: 'google' | 'kakao' | 'apple';
+  company: string;   // [회사명]
+  name: string;      // [이름]
+  role: string;      // [직책]
+  phone: string;     // [연락처]
+  email: string;     // [이메일]
+  character?: CharacterProfile;
+}
+
+// SD 동물 캐릭터 타입
+export type AnimalType = 'seagull' | 'seal' | 'cat' | 'quokka';
+
+// 캐릭터 프로필 및 아이템 장착 정보
+export interface CharacterProfile {
+  animalType: AnimalType;
+  name: string;
+  level: number;       // 1 ~ 5
+  points: number;      // 누적 포인트
+  equipped: {
+    headwear?: string;   // 모자/헤어
+    outfit?: string;     // 의상
+    accessory?: string;  // 악세사리
+  };
+}
+
+// 레벨업 보상 선택 옵션
+export interface LevelRewardOption {
+  id: string;
+  name: string;
+  category: 'headwear' | 'outfit' | 'accessory';
+  levelRequired: number;
+  icon: string;
+  description: string;
+}
+

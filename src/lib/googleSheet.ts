@@ -94,11 +94,11 @@ export async function appendLogToSheet(log: WorkationLog): Promise<{ success: bo
 
 // 오프스 부산 다중 탭 자동 분기 저장 인터페이스
 export interface SheetPayload {
-  type: 'review' | 'coupon' | 'course' | 'workspace';
+  type: 'review' | 'coupon' | 'course' | 'workspace' | 'signup' | 'point';
   [key: string]: any;
 }
 
-// 여러 개의 시트 탭(Guestbook_Reviews, CouponLogs, TimeAttackCourses)에 각각 나누어 자동 저장
+// 여러 개의 시트 탭(Guestbook_Reviews, CouponLogs, TimeAttackCourses, Users_Members, Point_Logs)에 각각 나누어 자동 저장
 export async function appendDataToSheet(payload: SheetPayload): Promise<{ success: boolean; fromGoogle: boolean; message: string }> {
   const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
   const sheetId = process.env.GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
@@ -140,7 +140,36 @@ export async function appendDataToSheet(payload: SheetPayload): Promise<{ succes
     let range = 'Guestbook_Reviews!A:F';
     let rowData: any[] = [];
 
-    if (payload.type === 'review') {
+    if (payload.type === 'signup') {
+      // 1) Users_Members 시트 (회원가입 정보)
+      range = 'Users_Members!A:K';
+      rowData = [
+        timestamp,
+        payload.email || '',
+        payload.name || '',
+        payload.company || '',
+        payload.role || '',
+        payload.phone || '',
+        payload.provider || 'Google',
+        payload.animalType || 'seagull',
+        payload.characterName || '',
+        payload.level || 1,
+        payload.points || 0,
+      ];
+    } else if (payload.type === 'point') {
+      // 2) Point_Logs 시트 (포인트 및 캐릭터 성장 로그)
+      range = 'Point_Logs!A:H';
+      rowData = [
+        timestamp,
+        payload.email || '',
+        payload.name || '',
+        payload.reason || '',
+        payload.earnedPoints || '+0P',
+        payload.totalPoints || 0,
+        payload.level || 'Lv.1',
+        payload.equipped || '기본',
+      ];
+    } else if (payload.type === 'review') {
       range = 'Guestbook_Reviews!A:F';
       rowData = [
         timestamp,
@@ -176,6 +205,7 @@ export async function appendDataToSheet(payload: SheetPayload): Promise<{ succes
         payload.benefit || '',
       ];
     }
+
 
     await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,

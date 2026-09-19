@@ -1,11 +1,11 @@
 /**
- * 🌊 오프스 부산 (Off-ce BUSAN) 구글 스프레드시트 자동 구축 & 실시간 DB 스크립트
+ * 🌊 오프스 부산 (Off-ce BUSAN) 구글 스프레드시트 자동 구축 & 실시간 DB 스크립트 (7개 탭 완전판)
  * 
  * [적용 방법 - 10초 완성]
  * 1. 구글 스프레드시트 상단 메뉴에서 [확장 프로그램] ➔ [Apps Script] 클릭
  * 2. 기존 코드를 모두 지우고 이 스크립트를 전체 복사하여 붙여넣기
  * 3. 상단 함수 선택에서 [setupAllOffCeSheets]를 선택한 뒤 [실행(Run)] 클릭!
- * ➔ 5개 탭(Workspaces, TimeAttackCourses, PartnerBenefits, CouponLogs, Guestbook_Reviews)과
+ * ➔ 7개 탭(Users_Members, Point_Logs, Workspaces, TimeAttackCourses, PartnerBenefits, CouponLogs, Guestbook_Reviews)과
  *    디자인 헤더 및 초기 마스터 데이터가 1초 만에 자동 생성됩니다!
  * 
  * [웹훅 실시간 연동 (선택사항)]
@@ -15,23 +15,29 @@
  *    - 배포 후 나오는 [웹 앱 URL]을 .env.local의 GOOGLE_APPS_SCRIPT_URL에 입력하면 실시간 자동 저장 연동 완료!
  */
 
-// 1. 전체 시트 탭 및 헤더, 초기 데이터 자동 생성 함수
+// 1. 전체 시트 탭(7종) 및 헤더, 초기 데이터 자동 생성 함수
 function setupAllOffCeSheets() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
 
-  // 1) Workspaces (워크스페이스 마스터)
+  // 1) Users_Members (회원 가입 마스터)
+  setupUsersSheet(ss);
+
+  // 2) Point_Logs (포인트 적립 & 캐릭터 성장 로그)
+  setupPointLogsSheet(ss);
+
+  // 3) Workspaces (워크스페이스 마스터)
   setupWorkspacesSheet(ss);
 
-  // 2) TimeAttackCourses (30분 타임어택 코스 로그)
+  // 4) TimeAttackCourses (30분 타임어택 코스 로그)
   setupCoursesSheet(ss);
 
-  // 3) PartnerBenefits (부산 체험 & F&B 로컬 기업 혜택 마스터)
+  // 5) PartnerBenefits (부산 체험 & F&B 로컬 기업 혜택 마스터)
   setupBenefitsSheet(ss);
 
-  // 4) CouponLogs (쿠폰 발급 및 사용 로그)
+  // 6) CouponLogs (쿠폰 발급 및 사용 로그)
   setupCouponLogsSheet(ss);
 
-  // 5) Guestbook_Reviews (노마드 방명록 & 리뷰)
+  // 7) Guestbook_Reviews (노마드 방명록 & 리뷰)
   setupReviewsSheet(ss);
 
   // 기본 빈 시트1 제거 (내용이 없을 경우)
@@ -42,10 +48,56 @@ function setupAllOffCeSheets() {
     } catch (e) {}
   }
 
-  Browser.msgBox('🎉 오프스 부산 5개 데이터 시트 자동 구축이 완료되었습니다!');
+  Browser.msgBox('🎉 오프스 부산 7개 데이터 시트 자동 구축이 성공적으로 완료되었습니다!');
 }
 
-// 1) Workspaces 시트 구축
+// 1) Users_Members 시트 구축
+function setupUsersSheet(ss) {
+  const sheetName = 'Users_Members';
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+  } else {
+    sheet.clear();
+  }
+
+  const headers = [
+    '가입일시', '이메일', '이름', '회사명', '직책', '연락처',
+    '간편로그인수단', '캐릭터종류', '캐릭터이름', '현재레벨', '보유포인트'
+  ];
+
+  const data = [
+    ['2026-09-19 14:20:00', 'jguy12@hanmail.net', '지정인', '더휴랩', '대표', '010-1234-5678', 'Google', 'seagull', '부산부기', 2, 280],
+    ['2026-09-19 15:10:00', 'nomad.busan@kakao.com', '김노마드', '스타트업웨이브', '프로덕트 디자이너', '010-9876-5432', 'Kakao', 'seal', '포미', 1, 150]
+  ];
+
+  formatSheet(sheet, headers, data, '#0284C7'); // Deep Ocean Blue Header
+}
+
+// 2) Point_Logs 시트 구축
+function setupPointLogsSheet(ss) {
+  const sheetName = 'Point_Logs';
+  let sheet = ss.getSheetByName(sheetName);
+  if (!sheet) {
+    sheet = ss.insertSheet(sheetName);
+  } else {
+    sheet.clear();
+  }
+
+  const headers = [
+    '일시', '회원이메일', '회원이름', '활동구분', '적립포인트', '누적포인트', '캐릭터레벨', '착용아이템'
+  ];
+
+  const data = [
+    ['2026-09-19 14:25:00', 'jguy12@hanmail.net', '지정인', '워크스페이스 체크인 (아스티 24F)', '+50P', 50, 'Lv.1', '기본'],
+    ['2026-09-19 15:40:00', 'jguy12@hanmail.net', '지정인', '30분 타임어택 코스 저장 (영도 노을)', '+100P', 150, 'Lv.1', '기본'],
+    ['2026-09-19 16:00:00', 'jguy12@hanmail.net', '지정인', '삼진어묵 15% 쿠폰 발급/사용', '+80P', 230, 'Lv.2 (레벨업!)', '⚓ 마린 세일러 캡']
+  ];
+
+  formatSheet(sheet, headers, data, '#0D9488'); // Teal Green Header
+}
+
+// 3) Workspaces 시트 구축
 function setupWorkspacesSheet(ss) {
   const sheetName = 'Workspaces';
   let sheet = ss.getSheetByName(sheetName);
@@ -72,7 +124,7 @@ function setupWorkspacesSheet(ss) {
   formatSheet(sheet, headers, data, '#0284C7'); // Ocean Blue Header
 }
 
-// 2) TimeAttackCourses 시트 구축
+// 4) TimeAttackCourses 시트 구축
 function setupCoursesSheet(ss) {
   const sheetName = 'TimeAttackCourses';
   let sheet = ss.getSheetByName(sheetName);
@@ -96,7 +148,7 @@ function setupCoursesSheet(ss) {
   formatSheet(sheet, headers, data, '#EA580C'); // Sunset Orange Header
 }
 
-// 3) PartnerBenefits 시트 구축
+// 5) PartnerBenefits 시트 구축
 function setupBenefitsSheet(ss) {
   const sheetName = 'PartnerBenefits';
   let sheet = ss.getSheetByName(sheetName);
@@ -121,7 +173,7 @@ function setupBenefitsSheet(ss) {
   formatSheet(sheet, headers, data, '#D97706'); // Amber Gold Header
 }
 
-// 4) CouponLogs 시트 구축
+// 6) CouponLogs 시트 구축
 function setupCouponLogsSheet(ss) {
   const sheetName = 'CouponLogs';
   let sheet = ss.getSheetByName(sheetName);
@@ -143,7 +195,7 @@ function setupCouponLogsSheet(ss) {
   formatSheet(sheet, headers, data, '#059669'); // Emerald Green Header
 }
 
-// 5) Guestbook_Reviews 시트 구축
+// 7) Guestbook_Reviews 시트 구축
 function setupReviewsSheet(ss) {
   const sheetName = 'Guestbook_Reviews';
   let sheet = ss.getSheetByName(sheetName);
@@ -206,10 +258,37 @@ function doPost(e) {
     const jsonString = e.postData.contents;
     const payload = JSON.parse(jsonString);
     const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const type = payload.type; // 'course' | 'coupon' | 'review' | 'workspace'
+    const type = payload.type; // 'signup' | 'point' | 'course' | 'coupon' | 'review' | 'workspace'
     const timestamp = Utilities.formatDate(new Date(), 'Asia/Seoul', 'yyyy-MM-dd HH:mm:ss');
 
-    if (type === 'review') {
+    if (type === 'signup') {
+      const sheet = ss.getSheetByName('Users_Members') || ss.insertSheet('Users_Members');
+      sheet.appendRow([
+        timestamp,
+        payload.email || '',
+        payload.name || '',
+        payload.company || '',
+        payload.role || '',
+        payload.phone || '',
+        payload.provider || 'Google',
+        payload.animalType || 'seagull',
+        payload.characterName || '',
+        payload.level || 1,
+        payload.points || 0
+      ]);
+    } else if (type === 'point') {
+      const sheet = ss.getSheetByName('Point_Logs') || ss.insertSheet('Point_Logs');
+      sheet.appendRow([
+        timestamp,
+        payload.email || '',
+        payload.name || '',
+        payload.reason || '',
+        payload.earnedPoints || '+0P',
+        payload.totalPoints || 0,
+        payload.level || 'Lv.1',
+        payload.equipped || '기본'
+      ]);
+    } else if (type === 'review') {
       const sheet = ss.getSheetByName('Guestbook_Reviews') || ss.insertSheet('Guestbook_Reviews');
       sheet.appendRow([
         timestamp,

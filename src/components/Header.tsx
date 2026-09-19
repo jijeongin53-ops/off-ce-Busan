@@ -12,6 +12,8 @@ interface HeaderProps {
   onOffTimeChange: (time: string) => void;
   isRainy: boolean;
   onToggleWeather: () => void;
+  user?: import('@/types').UserMember | null;
+  onOpenLogin?: () => void;
 }
 
 export default function Header({
@@ -21,7 +23,10 @@ export default function Header({
   onOffTimeChange,
   isRainy,
   onToggleWeather,
+  user,
+  onOpenLogin,
 }: HeaderProps) {
+
   const [timeLeftStr, setTimeLeftStr] = useState<string>('');
   const [isPastOffTime, setIsPastOffTime] = useState<boolean>(false);
 
@@ -77,32 +82,50 @@ export default function Header({
           </div>
         </div>
 
-        {/* 날씨 및 일몰 위젯 버튼 (클릭 시 우천/맑음 시뮬레이션 전환) */}
-        <button
-          onClick={onToggleWeather}
-          className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
-            isRainy
-              ? 'bg-blue-950/70 text-blue-300 border border-blue-800/60 shadow-sm'
-              : 'bg-orange-950/40 text-orange-300 border border-orange-800/50 shadow-sm'
-          }`}
-          title="클릭하여 날씨 시뮬레이션 변경 (맑음/비)"
-        >
-          {isRainy ? (
-            <>
-              <CloudRain className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
-              <span>부산 19℃ 비</span>
-            </>
-          ) : (
-            <>
-              <Sun className="w-3.5 h-3.5 text-orange-400" />
-              <span>부산 23℃ 맑음</span>
-              <span className="text-slate-600">|</span>
-              <Sunset className="w-3.5 h-3.5 text-amber-400" />
-              <span className="text-[11px] text-amber-300">일몰 18:42</span>
-            </>
-          )}
-        </button>
+        <div className="flex items-center space-x-1.5">
+          {/* 로그인 / 프로필 버튼 */}
+          <button
+            onClick={onOpenLogin}
+            className="flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 active:scale-95 transition-all shadow-sm"
+          >
+            {user ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="truncate max-w-[60px]">{user.name}</span>
+              </>
+            ) : (
+              <span>로그인</span>
+            )}
+          </button>
+
+          {/* 날씨 및 일몰 위젯 버튼 (클릭 시 우천/맑음 시뮬레이션 전환) */}
+          <button
+            onClick={onToggleWeather}
+            className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
+              isRainy
+                ? 'bg-blue-950/70 text-blue-300 border border-blue-800/60 shadow-sm'
+                : 'bg-orange-950/40 text-orange-300 border border-orange-800/50 shadow-sm'
+            }`}
+            title="클릭하여 날씨 시뮬레이션 변경 (맑음/비)"
+          >
+            {isRainy ? (
+              <>
+                <CloudRain className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+                <span>19℃ 비</span>
+              </>
+            ) : (
+              <>
+                <Sun className="w-3.5 h-3.5 text-orange-400" />
+                <span>23℃</span>
+                <span className="text-slate-600">|</span>
+                <Sunset className="w-3.5 h-3.5 text-amber-400" />
+                <span className="text-[11px] text-amber-300">18:42</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
+
 
       {/* 퇴근 타이머 바 & 퇴근 시간 선택 */}
       <div className="mt-2.5 bg-slate-900/90 border border-slate-800/90 rounded-xl p-2 flex items-center justify-between">
