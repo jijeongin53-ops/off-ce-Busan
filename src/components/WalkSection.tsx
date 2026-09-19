@@ -187,6 +187,47 @@ export default function WalkSection({
                     {item.spot.overview}
                   </p>
 
+                  {/* ★ 한국관광공사 두루누비(Durunubi) 공인 도보길 뱃지 연동 ★ */}
+                  {item.step === 2 && item.spot.durunubiInfo && (
+                    <div className="mt-2 p-2 rounded-xl bg-cyan-950/40 border border-cyan-500/30 text-[11px] space-y-0.5">
+                      <div className="flex items-center space-x-1.5 text-cyan-300 font-bold">
+                        <span>🚶 두루누비 공인 코스:</span>
+                        <span className="text-white">{item.spot.durunubiInfo.themeNm}</span>
+                        <span className="text-cyan-400 font-normal">
+                          ({item.spot.durunubiInfo.crsTotlRqrmHour} / {item.spot.durunubiInfo.crsDstnc})
+                        </span>
+                      </div>
+                      <p className="text-[10px] text-slate-400 truncate">
+                        {item.spot.durunubiInfo.crsSummary}
+                      </p>
+                    </div>
+                  )}
+
+                  {/* ★ 한국관광공사 오디(Odii) 1분 퇴근길 오디오 도슨트 플레이어 연동 ★ */}
+                  {item.step === 2 && item.spot.audioGuide && (
+                    <div className="mt-2 p-2 rounded-xl bg-purple-950/40 border border-purple-500/30 text-[11px]">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-1.5 text-purple-300 font-bold">
+                          <span>🎧 {item.spot.audioGuide.audioTitle}</span>
+                          <span className="text-[10px] text-purple-400">({item.spot.audioGuide.duration})</span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            alert(`🎧 [오디오 도슨트 재생 중]\n\n"${item.spot.audioGuide?.scriptContent}"`);
+                          }}
+                          className="px-2 py-0.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold shadow active:scale-95 transition-transform"
+                        >
+                          도슨트 듣기 ▶
+                        </button>
+                      </div>
+                      <p className="text-[10px] text-slate-400 mt-1 line-clamp-1 italic">
+                        "{item.spot.audioGuide.scriptContent}"
+                      </p>
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between text-[11px] text-slate-400 mt-2 pt-2 border-t border-slate-800/80">
                     <span className="truncate max-w-[200px]">{item.spot.addr1}</span>
                     <a
@@ -214,6 +255,7 @@ export default function WalkSection({
                 )}
               </div>
             </div>
+
           );
         })}
       </div>

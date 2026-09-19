@@ -48,7 +48,23 @@ export interface TourSpot {
   overview?: string;
   // F&B 및 로컬 체험 제휴 혜택 연동
   partnerBenefit?: PartnerBenefit;
+  // 한국관광공사 두루누비(Durunubi) 공인 걷기길 코스 연동
+  durunubiInfo?: {
+    themeNm: string;         // 테마명 (예: 남파랑길, 갈맷길, 해파랑길)
+    routeNm?: string;        // 코스명 (예: 갈맷길 3-2구간, 절영해안길)
+    crsDstnc?: string;       // 거리 (예: 2.5km)
+    crsTotlRqrmHour?: string;// 소요시간 (예: 30분)
+    crsSummary?: string;     // 코스 요약
+  };
+  // 한국관광공사 오디(Odii) 관광지 오디오 가이드 연동
+  audioGuide?: {
+    audioTitle: string;      // 오디오 해설 제목
+    audioUrl?: string;       // MP3 스트리밍 URL
+    scriptContent?: string;  // 나레이션 대본
+    duration?: string;       // 재생 시간 (예: 1분 30초)
+  };
 }
+
 
 // 부산 체험 & F&B 로컬 기업 마케팅 및 이용자 할인권
 export interface PartnerBenefit {
