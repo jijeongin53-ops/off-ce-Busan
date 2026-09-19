@@ -15,6 +15,7 @@ import CharacterCreateModal from '@/components/CharacterCreateModal';
 import LevelUpRewardModal from '@/components/LevelUpRewardModal';
 import CharacterWidget from '@/components/CharacterWidget';
 import CharacterProfileModal from '@/components/CharacterProfileModal';
+import { Navigation, RefreshCw } from 'lucide-react';
 
 import {
   AppMode,
@@ -292,7 +293,51 @@ export default function Home() {
         onUseMyLocation={handleUseMyLocation}
         isLocating={isLocating}
         isUsingMyLocation={isUsingMyLocation}
-      />
+      >
+        {/* 사용자 요청: 1시간 코스에서 [WALK] 퇴근... 을 칼퇴 완료! 바로 아래로 이동 */}
+        {currentMode === 'WALK' && (
+          <div className="mt-2.5 pt-2 border-t border-slate-100 flex items-center justify-between">
+            <div>
+              <div className="flex items-center space-x-1.5">
+                <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
+                <h2 className="text-sm font-extrabold text-slate-800 flex items-center space-x-1">
+                  <span>[WALK] 퇴근 후 1시간 타임어택 코스</span>
+                </h2>
+              </div>
+              <p className="text-[11px] text-slate-500 mt-0.5">
+                업무 공간 및 현재 위치에서 1시간(60분) 이내로 이어지는 로컬 라우팅
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-1.5 flex-shrink-0">
+              {/* 내 위치 추천 버튼 */}
+              <button
+                onClick={handleUseMyLocation}
+                disabled={isLocating || courseLoading}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 shadow-sm transition-all active:scale-95 ${
+                  isUsingMyLocation
+                    ? 'bg-cyan-500 text-white shadow-cyan-500/20'
+                    : 'bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100'
+                }`}
+                title="내 현재 GPS 위치를 기반으로 주변 1시간 코스 추천받기"
+              >
+                <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
+                <span>{isLocating ? '위치 찾는 중...' : isUsingMyLocation ? '내 위치 기반' : '내 위치 추천'}</span>
+              </button>
+
+              {/* 새로고침 버튼 */}
+              <button
+                onClick={() => loadTourCourse(selectedHub, isRainy)}
+                disabled={courseLoading}
+                className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-cyan-600 shadow-sm transition-colors active:scale-95"
+                title="다른 코스 조합 추천받기"
+              >
+                <RefreshCw className={`w-4 h-4 ${courseLoading ? 'animate-spin text-cyan-600' : ''}`} />
+              </button>
+            </div>
+          </div>
+        )}
+      </Header>
 
       {/* 1-1. SD 동물 캐릭터 육성 위젯 (레벨, 성장 포인트, 착용 아이템) */}
       <CharacterWidget

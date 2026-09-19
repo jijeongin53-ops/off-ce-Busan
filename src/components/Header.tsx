@@ -17,6 +17,7 @@ interface HeaderProps {
   onUseMyLocation?: () => void;
   isLocating?: boolean;
   isUsingMyLocation?: boolean;
+  children?: React.ReactNode;
 }
 
 export default function Header({
@@ -31,6 +32,7 @@ export default function Header({
   onUseMyLocation,
   isLocating,
   isUsingMyLocation,
+  children,
 }: HeaderProps) {
 
   const [timeLeftStr, setTimeLeftStr] = useState<string>('');
@@ -155,6 +157,9 @@ export default function Header({
           </select>
         </div>
       </div>
+
+      {/* 사용자 요청: 칼퇴 완료! 바로 아래 슬롯 (1시간 코스 타임어택 헤더 등) */}
+      {children}
 
       {/* 부산 워케이션 거점 칩 목록 & 내 위치 추천 */}
       <div className="mt-2.5 flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">

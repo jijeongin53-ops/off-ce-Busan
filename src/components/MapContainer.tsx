@@ -212,12 +212,12 @@ export default function MapContainer({
                       {spotTitle || step.label}
                     </span>
 
-                    {/* 모던한 제휴 쿠폰 뱃지 */}
-                    {hasCoupon && (
+                    {/* 모던한 제휴 쿠폰 뱃지 (사용자 요청에 따라 로컬 제휴 혜택 비표시) */}
+                    {/* {hasCoupon && (
                       <span className="mt-1 px-1.5 py-0.2 bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-bold rounded-full shadow-xs">
                         {step.spot?.partnerBenefit?.discountRate || '쿠폰'}
                       </span>
-                    )}
+                    )} */}
                   </div>
                 );
               })}

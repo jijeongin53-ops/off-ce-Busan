@@ -48,49 +48,7 @@ export default function WalkSection({
 }: WalkSectionProps) {
   return (
     <div className="p-4 space-y-4">
-      {/* 타임어택 헤더 & 현재 위치 추천 버튼 */}
-      <div className="flex items-center justify-between">
-        <div>
-          <div className="flex items-center space-x-1.5">
-            <span className="w-2 h-2 rounded-full bg-orange-500 animate-ping" />
-            <h2 className="text-base font-extrabold text-slate-800 flex items-center space-x-1">
-              <span>[WALK] 퇴근 후 1시간 타임어택 코스</span>
-            </h2>
-          </div>
-          <p className="text-xs text-slate-500 mt-0.5">
-            업무 공간 및 현재 위치에서 1시간(60분) 이내로 이어지는 로컬 라우팅
-          </p>
-        </div>
-
-        <div className="flex items-center space-x-1.5">
-          {/* 현재 위치 기반 1시간 코스 추천 버튼 */}
-          {onUseMyLocation && (
-            <button
-              onClick={onUseMyLocation}
-              disabled={isLocating || loading}
-              className={`px-2.5 py-1.5 rounded-xl text-xs font-bold flex items-center space-x-1 shadow-sm transition-all active:scale-95 ${
-                isUsingMyLocation
-                  ? 'bg-cyan-500 text-white shadow-cyan-500/20'
-                  : 'bg-cyan-50 text-cyan-700 border border-cyan-200 hover:bg-cyan-100'
-              }`}
-              title="내 현재 GPS 위치를 기반으로 주변 1시간 코스 추천받기"
-            >
-              <Navigation className={`w-3.5 h-3.5 ${isLocating ? 'animate-spin' : ''}`} />
-              <span>{isLocating ? '위치 찾는 중...' : isUsingMyLocation ? '내 위치 기반' : '내 위치 추천'}</span>
-            </button>
-          )}
-
-          {/* 새로고침 버튼 */}
-          <button
-            onClick={onRefreshCourse}
-            disabled={loading}
-            className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-cyan-600 shadow-sm transition-colors active:scale-95"
-            title="다른 코스 조합 추천받기"
-          >
-            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cyan-600' : ''}`} />
-          </button>
-        </div>
-      </div>
+      {/* 타임어택 헤더 & 현재 위치 추천 버튼 (상단 "칼퇴 완료! 바로 아래"로 이동됨) */}
 
       {/* 코스 요약 배너 */}
       <div className="p-3.5 rounded-2xl bg-gradient-to-r from-orange-50 via-white to-cyan-50 border border-orange-200 flex items-center justify-between shadow-sm">
@@ -121,8 +79,8 @@ export default function WalkSection({
         </button>
       </div>
 
-      {/* ★ 사용자 추가 요청: 부산 체험 & F&B 기업 상생 마케팅 할인권 배너 ★ */}
-      {course.partnerBenefit && (
+      {/* ★ 사용자 추가 요청: 부산 체험 & F&B 기업 상생 마케팅 할인권 배너 (사용자 요청으로 비표시 처리) ★ */}
+      {/* {course.partnerBenefit && (
         <div
           onClick={() => onOpenBenefitModal(course.partnerBenefit!)}
           className="p-3 rounded-2xl bg-gradient-to-r from-amber-50 via-orange-50/50 to-white border border-amber-200 cursor-pointer hover:border-amber-300 transition-all group shadow-sm"
@@ -152,7 +110,7 @@ export default function WalkSection({
             </div>
           </div>
         </div>
-      )}
+      )} */}
 
       {/* 1, 2, 3단계 스팟 카드 리스트 */}
       <div className="space-y-2.5 relative">
