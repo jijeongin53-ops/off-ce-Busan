@@ -18,6 +18,7 @@ interface HeaderProps {
   isLocating?: boolean;
   isUsingMyLocation?: boolean;
   children?: React.ReactNode;
+  onOpenWelcome?: () => void;
 }
 
 export default function Header({
@@ -33,6 +34,7 @@ export default function Header({
   isLocating,
   isUsingMyLocation,
   children,
+  onOpenWelcome,
 }: HeaderProps) {
 
   const [timeLeftStr, setTimeLeftStr] = useState<string>('');
@@ -71,8 +73,12 @@ export default function Header({
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 pt-3 pb-3 shadow-sm">
       {/* 최상단 브랜딩 & 날씨 토글 */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 via-sky-400 to-orange-400 flex items-center justify-center shadow-md shadow-cyan-500/20">
+        <div
+          onClick={onOpenWelcome}
+          className="flex items-center space-x-2 cursor-pointer group"
+          title="시작 화면(홈) 보기"
+        >
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 via-sky-400 to-orange-400 flex items-center justify-center shadow-md shadow-cyan-500/20 group-hover:scale-105 transition-transform">
             <Sparkles className="w-4 h-4 text-white stroke-[2.5]" />
           </div>
           <div>

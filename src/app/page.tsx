@@ -15,6 +15,7 @@ import CharacterCreateModal from '@/components/CharacterCreateModal';
 import LevelUpRewardModal from '@/components/LevelUpRewardModal';
 import CharacterWidget from '@/components/CharacterWidget';
 import CharacterProfileModal from '@/components/CharacterProfileModal';
+import WelcomeScreen from '@/components/WelcomeScreen';
 import { Navigation, RefreshCw } from 'lucide-react';
 
 import {
@@ -46,6 +47,7 @@ export default function Home() {
   const [character, setCharacter] = useState<CharacterProfile | null>(null);
 
   // 모달 제어 상태
+  const [showWelcomeScreen, setShowWelcomeScreen] = useState<boolean>(true); // 듀오링고 컨셉 시작 화면
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [isCharacterCreateOpen, setIsCharacterCreateOpen] = useState<boolean>(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
@@ -293,6 +295,7 @@ export default function Home() {
         onUseMyLocation={handleUseMyLocation}
         isLocating={isLocating}
         isUsingMyLocation={isUsingMyLocation}
+        onOpenWelcome={() => setShowWelcomeScreen(true)}
       >
         {/* 사용자 요청: 1시간 코스에서 [WALK] 퇴근... 을 칼퇴 완료! 바로 아래로 이동 */}
         {currentMode === 'WALK' && (
@@ -483,6 +486,21 @@ export default function Home() {
             setIsSaveModalOpen(false);
             earnPoints(120, `[${activeCourse.title}] 코스 완주 및 방명록 저장`);
           }}
+        />
+      )}
+
+      {/* 10. 듀오링고 컨셉의 시작 화면 (풀스크린 온보딩/스플래시) */}
+      {showWelcomeScreen && (
+        <WelcomeScreen
+          onStartSignUp={() => {
+            setShowWelcomeScreen(false);
+            setIsLoginModalOpen(true);
+          }}
+          onOpenLogin={() => {
+            setShowWelcomeScreen(false);
+            setIsLoginModalOpen(true);
+          }}
+          onExplore={() => setShowWelcomeScreen(false)}
         />
       )}
     </main>
