@@ -46,38 +46,38 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
   return (
     <div className="p-4 space-y-4">
       {/* 구글 시트 백엔드 연동 정보 카드 */}
-      <div className="p-4 rounded-3xl bg-slate-900 border border-slate-800 space-y-2.5">
+      <div className="p-4 rounded-3xl bg-white border border-slate-200 space-y-2.5 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Database className="w-4 h-4 text-emerald-400" />
-            <span className="text-xs font-bold text-slate-200">
+            <Database className="w-4 h-4 text-emerald-600" />
+            <span className="text-xs font-bold text-slate-800">
               Google Sheet 데이터베이스
             </span>
           </div>
           <span
             className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
               isFromGoogle
-                ? 'bg-emerald-950 text-emerald-300 border-emerald-700'
-                : 'bg-slate-800 text-slate-300 border-slate-700'
+                ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                : 'bg-slate-100 text-slate-600 border-slate-200'
             }`}
           >
             {isFromGoogle ? '실시간 동기화' : 'API 백엔드 대기'}
           </span>
         </div>
 
-        <p className="text-xs text-slate-400 leading-relaxed">
+        <p className="text-xs text-slate-600 leading-relaxed">
           앱에서 남긴 방문 기록과 추천 평점은 구글 스프레드시트에 즉시 기록되어 관리자 분석 및 통계로 활용됩니다.
         </p>
 
-        <div className="pt-2 flex items-center justify-between border-t border-slate-800">
-          <span className="text-[11px] text-slate-500 truncate max-w-[200px]">
+        <div className="pt-2 flex items-center justify-between border-t border-slate-100">
+          <span className="text-[11px] text-slate-400 truncate max-w-[200px]">
             봇: sheet-bot@peo-schedule...
           </span>
           <a
             href={sheetUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center space-x-1 text-xs text-cyan-400 font-bold hover:underline"
+            className="flex items-center space-x-1 text-xs text-cyan-600 font-bold hover:underline"
           >
             <span>스프레드시트 열기</span>
             <ExternalLink className="w-3 h-3" />
@@ -86,77 +86,77 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
       </div>
 
       {/* 7개 시트 탭 자동 분기 저장 구조 안내 */}
-      <div className="p-4 rounded-3xl bg-slate-900/90 border border-cyan-500/30 space-y-3">
+      <div className="p-4 rounded-3xl bg-white border border-cyan-200 space-y-3 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1.5">
-            <span className="text-xs font-black text-cyan-400 uppercase tracking-wider">
+            <span className="text-xs font-black text-cyan-700 uppercase tracking-wider">
               자동 분기 저장 시트 탭 (7종)
             </span>
           </div>
-          <span className="text-[10px] bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/20">
+          <span className="text-[10px] bg-cyan-50 text-cyan-700 px-2 py-0.5 rounded border border-cyan-200 font-semibold">
             자동 매핑 완료
           </span>
         </div>
 
         <div className="grid grid-cols-1 gap-2 text-xs">
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="font-bold text-sky-400">1. Users_Members</span>
-              <p className="text-[11px] text-slate-400">회원 가입 마스터 ([회사명][이름][직책][연락처][이메일])</p>
+              <span className="font-bold text-sky-700">1. Users_Members</span>
+              <p className="text-[11px] text-slate-500">회원 가입 마스터 ([회사명][이름][직책][연락처][이메일])</p>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">11개 열</span>
+            <span className="text-[10px] text-slate-400 font-mono">11개 열</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="font-bold text-teal-400">2. Point_Logs</span>
-              <p className="text-[11px] text-slate-400">활동 포인트 적립 및 SD 캐릭터 성장/의상 로그</p>
+              <span className="font-bold text-teal-700">2. Point_Logs</span>
+              <p className="text-[11px] text-slate-500">활동 포인트 적립 및 SD 캐릭터 성장/의상 로그</p>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">8개 열</span>
+            <span className="text-[10px] text-slate-400 font-mono">8개 열</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="font-bold text-blue-400">3. Workspaces</span>
-              <p className="text-[11px] text-slate-400">부산 원도심 워크스페이스 마스터 (카페·오피스)</p>
+              <span className="font-bold text-blue-700">3. Workspaces</span>
+              <p className="text-[11px] text-slate-500">부산 원도심 워크스페이스 마스터 (카페·오피스)</p>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">14개 열</span>
+            <span className="text-[10px] text-slate-400 font-mono">14개 열</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="font-bold text-orange-400">4. TimeAttackCourses</span>
-              <p className="text-[11px] text-slate-400">30분 타임어택 퇴근길 코스 조합 이력</p>
+              <span className="font-bold text-orange-700">4. TimeAttackCourses</span>
+              <p className="text-[11px] text-slate-500">30분 타임어택 퇴근길 코스 조합 이력</p>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">11개 열</span>
+            <span className="text-[10px] text-slate-400 font-mono">11개 열</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="font-bold text-amber-400">5. PartnerBenefits</span>
-              <p className="text-[11px] text-slate-400">부산 체험 & F&B 로컬 기업 마케팅 제휴 혜택</p>
+              <span className="font-bold text-amber-700">5. PartnerBenefits</span>
+              <p className="text-[11px] text-slate-500">부산 체험 & F&B 로컬 기업 마케팅 제휴 혜택</p>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">9개 열</span>
+            <span className="text-[10px] text-slate-400 font-mono">9개 열</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="font-bold text-emerald-400">6. CouponLogs</span>
-              <p className="text-[11px] text-slate-400">할인 쿠폰 발급 및 코드 복사 실시간 로그</p>
+              <span className="font-bold text-emerald-700">6. CouponLogs</span>
+              <p className="text-[11px] text-slate-500">할인 쿠폰 발급 및 코드 복사 실시간 로그</p>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">6개 열</span>
+            <span className="text-[10px] text-slate-400 font-mono">6개 열</span>
           </div>
 
-          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
-              <span className="font-bold text-purple-400">7. Guestbook_Reviews</span>
-              <p className="text-[11px] text-slate-400">노마드 방문 후기, 별점 및 퇴근길 소감</p>
+              <span className="font-bold text-purple-700">7. Guestbook_Reviews</span>
+              <p className="text-[11px] text-slate-500">노마드 방문 후기, 별점 및 퇴근길 소감</p>
             </div>
-            <span className="text-[10px] text-slate-500 font-mono">6개 열</span>
+            <span className="text-[10px] text-slate-400 font-mono">6개 열</span>
           </div>
         </div>
 
-        <div className="pt-2 text-[11px] text-slate-400 bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed">
+        <div className="pt-2 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-200 leading-relaxed">
           💡 <strong>구글 시트 10초 자동 세팅 팁:</strong> 구글 시트 상단의 <code>확장 프로그램 ➔ Apps Script</code>에 프로젝트 내 <code>scripts/google_apps_script.js</code> 코드를 붙여넣고 [실행]을 누르면 7개 탭과 헤더 서식, 초기 데이터가 1초 만에 자동 생성됩니다!
         </div>
       </div>
@@ -165,13 +165,13 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
 
       {/* 방명록 작성 CTA */}
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-bold text-white flex items-center space-x-1.5">
-          <MessageSquare className="w-4 h-4 text-cyan-400" />
+        <h3 className="text-sm font-extrabold text-slate-900 flex items-center space-x-1.5">
+          <MessageSquare className="w-4 h-4 text-cyan-600" />
           <span>워케이션 노마드 실시간 방명록</span>
         </h3>
         <button
           onClick={onOpenSaveModal}
-          className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 text-xs font-black shadow-md active:scale-95 transition-all"
+          className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white text-xs font-bold shadow-sm active:scale-95 transition-all"
         >
           <Plus className="w-3.5 h-3.5" />
           <span>기록 남기기</span>
@@ -183,30 +183,30 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
         {MOCK_LOGS.map((log) => (
           <div
             key={log.id}
-            className="p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800 space-y-1.5"
+            className="p-3.5 rounded-2xl bg-white border border-slate-200 space-y-1.5 shadow-sm"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="text-xs font-bold text-cyan-300">
+                <span className="text-xs font-bold text-cyan-800">
                   {log.userName}
                 </span>
-                <span className="text-[10px] text-slate-500">
+                <span className="text-[10px] text-slate-400">
                   {log.timestamp}
                 </span>
               </div>
               <div className="flex items-center space-x-0.5">
                 {[...Array(log.rating)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 text-amber-400 fill-amber-400" />
+                  <Star key={i} className="w-3 h-3 text-amber-500 fill-amber-500" />
                 ))}
               </div>
             </div>
 
-            <div className="text-xs text-slate-300 font-medium">
-              📍 <span className="text-slate-400">{log.workspaceName}</span> ➔{' '}
-              <span className="text-orange-400">{log.visitedCourseTitle}</span>
+            <div className="text-xs text-slate-700 font-medium">
+              📍 <span className="text-slate-500">{log.workspaceName}</span> ➔{' '}
+              <span className="text-orange-600 font-bold">{log.visitedCourseTitle}</span>
             </div>
 
-            <p className="text-xs text-slate-400 leading-relaxed bg-slate-950/60 p-2.5 rounded-xl border border-slate-800/60">
+            <p className="text-xs text-slate-600 leading-relaxed bg-slate-50 p-2.5 rounded-xl border border-slate-100">
               "{log.reviewComment}"
             </p>
           </div>

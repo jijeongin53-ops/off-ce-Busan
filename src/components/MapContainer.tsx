@@ -53,14 +53,14 @@ export default function MapContainer({
   }, []);
 
   return (
-    <div className="relative w-full h-80 bg-slate-950 overflow-hidden border-b border-slate-800">
+    <div className="relative w-full h-80 bg-slate-100 overflow-hidden border-b border-slate-200">
       {/* 인터랙티브 맵 캔버스 영역 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-[#0B1528] to-slate-950">
+      <div className="absolute inset-0 bg-gradient-to-b from-sky-50/60 via-indigo-50/30 to-slate-100">
         {/* 부산 지형 무드 배경 격자 및 해안선 그래픽 */}
-        <svg className="w-full h-full opacity-30 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
+        <svg className="w-full h-full opacity-60 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#1E293B" strokeWidth="1" />
+              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#CBD5E1" strokeWidth="1" />
             </pattern>
             <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#0EA5E9" />
@@ -72,13 +72,13 @@ export default function MapContainer({
           {/* 부산 바다 & 해안 웨이브 무드 */}
           <path
             d="M -50,220 Q 80,180 200,240 T 450,200 L 450,350 L -50,350 Z"
-            fill="#0369A1"
-            opacity="0.25"
+            fill="#38BDF8"
+            opacity="0.18"
           />
           <path
             d="M -50,250 Q 120,220 250,260 T 450,240 L 450,350 L -50,350 Z"
             fill="#0284C7"
-            opacity="0.3"
+            opacity="0.14"
           />
         </svg>
 
@@ -117,10 +117,10 @@ export default function MapContainer({
                   }`}
                 >
                   <div
-                    className={`px-2 py-1 rounded-full text-[10px] font-bold shadow-lg flex items-center space-x-1 mb-1 border transition-all ${
+                    className={`px-2 py-1 rounded-full text-[10px] font-bold shadow-md flex items-center space-x-1 mb-1 border transition-all ${
                       isSelected
-                        ? 'bg-cyan-400 text-slate-950 border-cyan-200 shadow-cyan-500/50 scale-105'
-                        : 'bg-slate-900/90 text-slate-200 border-slate-700'
+                        ? 'bg-cyan-500 text-white border-cyan-400 shadow-cyan-500/40 scale-105'
+                        : 'bg-white/95 text-slate-700 border-slate-200'
                     }`}
                   >
                     <Coffee className="w-2.5 h-2.5" />
@@ -129,8 +129,8 @@ export default function MapContainer({
                   <div
                     className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
                       isSelected
-                        ? 'bg-cyan-500 border-white text-slate-950 ring-4 ring-cyan-500/30'
-                        : 'bg-slate-800 border-cyan-400 text-cyan-300'
+                        ? 'bg-cyan-500 border-white text-white ring-4 ring-cyan-500/30'
+                        : 'bg-white border-cyan-500 text-cyan-600 shadow-sm'
                     }`}
                   >
                     <MapPin className="w-3.5 h-3.5" />
@@ -202,19 +202,19 @@ export default function MapContainer({
 
       {/* 우측 상단 모드 & 나침반 표시 */}
       <div className="absolute top-3 right-3 z-30 flex flex-col items-end space-y-1.5">
-        <div className="px-2.5 py-1 rounded-full bg-slate-900/90 border border-slate-700 text-[11px] font-semibold text-cyan-300 flex items-center space-x-1 shadow-md">
-          <Compass className="w-3.5 h-3.5 text-cyan-400 animate-spin" style={{ animationDuration: '10s' }} />
+        <div className="px-2.5 py-1 rounded-full bg-white/95 border border-slate-200 text-[11px] font-bold text-cyan-700 flex items-center space-x-1 shadow-sm">
+          <Compass className="w-3.5 h-3.5 text-cyan-600 animate-spin" style={{ animationDuration: '10s' }} />
           <span>{selectedHub.name.split(' ')[0]} 중심</span>
         </div>
-        <div className="text-[10px] text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded border border-slate-800">
+        <div className="text-[10px] text-slate-500 bg-white/90 px-2 py-0.5 rounded border border-slate-200 shadow-xs">
           반경 3km 마이크로 투어
         </div>
       </div>
 
       {/* 지도 하단: 카카오 길찾기 바로가기 바 */}
       <div className="absolute bottom-2 left-3 right-3 z-30 flex items-center justify-between pointer-events-auto">
-        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-800 flex items-center space-x-2 text-xs text-slate-300">
-          <Navigation className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200 flex items-center space-x-2 text-xs text-slate-700 shadow-sm">
+          <Navigation className="w-3.5 h-3.5 text-cyan-600" />
           <span className="font-medium">
             {mode === 'WORK'
               ? selectedWorkspace?.name || '워크스페이스 선택'

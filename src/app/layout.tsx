@@ -12,7 +12,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: "#0B0F19",
+  themeColor: "#ffffff",
 };
 
 export default function RootLayout({
@@ -21,9 +21,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko" className="dark">
-      <body className="antialiased bg-[#0B0F19] text-slate-100 min-h-screen selection:bg-cyan-500 selection:text-white">
-        <div className="max-w-md mx-auto min-h-screen relative flex flex-col bg-[#0B0F19] shadow-2xl shadow-cyan-950/30 border-x border-slate-800/40">
+    <html lang="ko">
+      <body className="antialiased bg-slate-100 text-slate-800 min-h-screen selection:bg-cyan-500 selection:text-white">
+        <div className="max-w-md mx-auto min-h-screen relative flex flex-col bg-white shadow-xl shadow-slate-300/40 border-x border-slate-200">
           {children}
         </div>
       </body>

@@ -60,23 +60,20 @@ export default function Header({
   }, [offTime]);
 
   return (
-    <header className="sticky top-0 z-40 bg-[#0B0F19]/90 backdrop-blur-md border-b border-slate-800/80 px-4 pt-3 pb-3">
+    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 px-4 pt-3 pb-3 shadow-sm">
       {/* 최상단 브랜딩 & 날씨 토글 */}
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 via-sky-400 to-orange-400 flex items-center justify-center shadow-lg shadow-cyan-500/20">
-            <Sparkles className="w-4 h-4 text-slate-950 stroke-[2.5]" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-cyan-500 via-sky-400 to-orange-400 flex items-center justify-center shadow-md shadow-cyan-500/20">
+            <Sparkles className="w-4 h-4 text-white stroke-[2.5]" />
           </div>
           <div>
             <div className="flex items-baseline space-x-1.5">
-              <h1 className="text-lg font-extrabold tracking-tight bg-gradient-to-r from-cyan-400 to-sky-200 bg-clip-text text-transparent">
+              <h1 className="text-lg font-extrabold tracking-tight bg-gradient-to-r from-cyan-600 to-sky-600 bg-clip-text text-transparent">
                 Off-ce BUSAN
               </h1>
-              <span className="text-[11px] font-semibold text-orange-400 bg-orange-500/10 px-1.5 py-0.5 rounded border border-orange-500/20">
-                오프스 부산
-              </span>
             </div>
-            <p className="text-[10px] text-slate-400">
+            <p className="text-[10px] text-slate-500">
               낮엔 몰입의 Office, 18시엔 낭만의 Off
             </p>
           </div>
@@ -86,11 +83,11 @@ export default function Header({
           {/* 로그인 / 프로필 버튼 */}
           <button
             onClick={onOpenLogin}
-            className="flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-bold bg-slate-800 hover:bg-slate-700 text-cyan-300 border border-slate-700 active:scale-95 transition-all shadow-sm"
+            className="flex items-center space-x-1 px-2.5 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-200 text-cyan-800 border border-slate-200 active:scale-95 transition-all shadow-sm"
           >
             {user ? (
               <>
-                <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span className="truncate max-w-[60px]">{user.name}</span>
               </>
             ) : (
@@ -103,23 +100,23 @@ export default function Header({
             onClick={onToggleWeather}
             className={`flex items-center space-x-1.5 px-2.5 py-1.5 rounded-full text-xs font-medium transition-all ${
               isRainy
-                ? 'bg-blue-950/70 text-blue-300 border border-blue-800/60 shadow-sm'
-                : 'bg-orange-950/40 text-orange-300 border border-orange-800/50 shadow-sm'
+                ? 'bg-blue-50 text-blue-700 border border-blue-200 shadow-sm'
+                : 'bg-orange-50 text-orange-800 border border-orange-200 shadow-sm'
             }`}
             title="클릭하여 날씨 시뮬레이션 변경 (맑음/비)"
           >
             {isRainy ? (
               <>
-                <CloudRain className="w-3.5 h-3.5 text-blue-400 animate-pulse" />
+                <CloudRain className="w-3.5 h-3.5 text-blue-500 animate-pulse" />
                 <span>19℃ 비</span>
               </>
             ) : (
               <>
-                <Sun className="w-3.5 h-3.5 text-orange-400" />
+                <Sun className="w-3.5 h-3.5 text-orange-500" />
                 <span>23℃</span>
-                <span className="text-slate-600">|</span>
-                <Sunset className="w-3.5 h-3.5 text-amber-400" />
-                <span className="text-[11px] text-amber-300">18:42</span>
+                <span className="text-slate-300">|</span>
+                <Sunset className="w-3.5 h-3.5 text-amber-500" />
+                <span className="text-[11px] text-amber-600 font-semibold">18:42</span>
               </>
             )}
           </button>
@@ -128,20 +125,20 @@ export default function Header({
 
 
       {/* 퇴근 타이머 바 & 퇴근 시간 선택 */}
-      <div className="mt-2.5 bg-slate-900/90 border border-slate-800/90 rounded-xl p-2 flex items-center justify-between">
+      <div className="mt-2.5 bg-slate-50 border border-slate-200 rounded-xl p-2 flex items-center justify-between shadow-xs">
         <div className="flex items-center space-x-2">
-          <Clock className={`w-4 h-4 ${isPastOffTime ? 'text-emerald-400' : 'text-cyan-400'}`} />
-          <span className={`text-xs font-semibold ${isPastOffTime ? 'text-emerald-400' : 'text-slate-200'}`}>
+          <Clock className={`w-4 h-4 ${isPastOffTime ? 'text-emerald-500' : 'text-cyan-600'}`} />
+          <span className={`text-xs font-bold ${isPastOffTime ? 'text-emerald-600' : 'text-slate-700'}`}>
             {timeLeftStr}
           </span>
         </div>
         <div className="flex items-center space-x-1">
-          <label htmlFor="offtime-select" className="text-[10px] text-slate-400">퇴근:</label>
+          <label htmlFor="offtime-select" className="text-[10px] text-slate-500">퇴근:</label>
           <select
             id="offtime-select"
             value={offTime}
             onChange={(e) => onOffTimeChange(e.target.value)}
-            className="bg-slate-800 text-cyan-300 text-xs font-bold rounded-lg px-2 py-0.5 border border-slate-700 focus:outline-none focus:ring-1 focus:ring-cyan-500"
+            className="bg-white text-cyan-800 text-xs font-bold rounded-lg px-2 py-0.5 border border-slate-300 focus:outline-none focus:ring-1 focus:ring-cyan-500 shadow-xs"
           >
             <option value="17:00">17:00</option>
             <option value="17:30">17:30</option>
@@ -155,8 +152,8 @@ export default function Header({
 
       {/* 부산 워케이션 거점 칩 목록 */}
       <div className="mt-2.5 flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">
-        <span className="text-[11px] text-slate-400 flex items-center flex-shrink-0 mr-1">
-          <MapPin className="w-3 h-3 mr-0.5 text-cyan-400" />
+        <span className="text-[11px] text-slate-500 flex items-center flex-shrink-0 mr-1">
+          <MapPin className="w-3 h-3 mr-0.5 text-cyan-600" />
           거점:
         </span>
         {BUSAN_HUBS.map((hub) => {
@@ -167,8 +164,8 @@ export default function Header({
               onClick={() => onSelectHub(hub)}
               className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 isSelected
-                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-md shadow-cyan-500/20'
-                  : 'bg-slate-900/80 text-slate-300 hover:bg-slate-800 border border-slate-800'
+                  ? 'bg-cyan-500 text-white font-bold shadow-md shadow-cyan-500/20'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200/80 border border-slate-200'
               }`}
             >
               {hub.name.split(' ')[0]}

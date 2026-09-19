@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --background: #0B0F19;
-  --foreground: #F8FAFC;
+  --background: #FFFFFF;
+  --foreground: #0F172A;
 }
 
 body {
@@ -26,24 +26,24 @@ body {
 
 /* 네온 글로우 효과 */
 .glow-ocean {
-  box-shadow: 0 0 20px -5px rgba(14, 165, 233, 0.4);
+  box-shadow: 0 0 20px -5px rgba(14, 165, 233, 0.25);
 }
 
 .glow-sunset {
-  box-shadow: 0 0 20px -5px rgba(249, 115, 22, 0.4);
+  box-shadow: 0 0 20px -5px rgba(249, 115, 22, 0.25);
 }
 
 /* Glassmorphism */
 .glass-panel {
-  background: rgba(30, 41, 59, 0.75);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
 
 .glass-card {
-  background: rgba(15, 23, 42, 0.65);
+  background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(226, 232, 240, 0.8);
 }
