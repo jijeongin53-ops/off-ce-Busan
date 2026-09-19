@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
-import { Navigation, MapPin, Compass, ExternalLink, Sparkles, Coffee, Award } from 'lucide-react';
-import { Workspace, TimeAttackCourse, TourSpot, LocationPoint } from '@/types';
+import React, { useEffect, useState } from 'react';
+import { Navigation, MapPin, Compass, ExternalLink, Sparkles, Coffee, Award, Utensils, Mountain, Home as HomeIcon } from 'lucide-react';
+import { Workspace, TimeAttackCourse, TourSpot, LocationPoint, CharacterProfile } from '@/types';
+import { ANIMAL_SPECIES } from '@/lib/characterData';
 
 interface MapContainerProps {
   mode: 'WORK' | 'WALK';
@@ -14,6 +15,7 @@ interface MapContainerProps {
   selectedSpot: TourSpot | null;
   onSelectSpot: (spot: TourSpot) => void;
   onOpenBenefit: () => void;
+  character?: CharacterProfile | null;
 }
 
 export default function MapContainer({
@@ -26,172 +28,193 @@ export default function MapContainer({
   selectedSpot,
   onSelectSpot,
   onOpenBenefit,
+  character,
 }: MapContainerProps) {
-  const kakaoMapRef = useRef<HTMLDivElement>(null);
-  const [kakaoLoaded, setKakaoLoaded] = useState<boolean>(false);
-  const [activeStep, setActiveStep] = useState<number>(1);
+  // 사용자가 전달한 캐릭터 또는 기본 갈매기(부산부기)
+  const species = character
+    ? ANIMAL_SPECIES.find((a) => a.type === character.animalType) || ANIMAL_SPECIES[0]
+    : ANIMAL_SPECIES[0];
 
-  // 카카오맵 SDK 로드 시도
-  useEffect(() => {
-    const kakaoKey = process.env.NEXT_PUBLIC_KAKAO_MAP_KEY;
-    if (!kakaoKey) return;
+  // 1. WALK 모드: 사용자 요청 4단계 흐름도 노드 데이터 구성 (1: 맛집, 2: 관광지, 3: 카페, 4: 숙소)
+  const foodSpot = activeCourse?.spots.find((s) => s.role === '맛집')?.spot || activeCourse?.spots[0]?.spot;
+  const tourSpot = activeCourse?.spots.find((s) => s.role === '산책/문화')?.spot || activeCourse?.spots[1]?.spot;
+  const staySpot = activeCourse?.spots.find((s) => s.role === '숙소')?.spot || activeCourse?.spots[2]?.spot;
 
-    if (window.kakao && window.kakao.maps) {
-      setKakaoLoaded(true);
-      return;
-    }
+  // 카페 기본 스팟 (영도/초량 거점 맞춤)
+  const cafeSpot: TourSpot = {
+    contentid: 'spot-flow-cafe',
+    contenttypeid: '39',
+    title: selectedHub.name.includes('영도') ? '신기산업 (영도 오션뷰 카페)' : '초량 1941 (적산가옥 카페)',
+    addr1: selectedHub.name.includes('영도') ? '부산광역시 영도구 와치로 51' : '부산광역시 동구 망양로 533-5',
+    mapx: selectedHub.lng,
+    mapy: selectedHub.lat,
+    categoryLabel: '로컬 감성 카페',
+    overview: '탁 트인 부산 앞바다와 함께 즐기는 시원한 드립 커피와 디저트 휴식.',
+  };
 
-    const script = document.createElement('script');
-    script.src = `//dapi.kakao.com/v2/maps/sdk.js?appkey=${kakaoKey}&autoload=false`;
-    script.async = true;
-    script.onload = () => {
-      window.kakao.maps.load(() => {
-        setKakaoLoaded(true);
-      });
-    };
-    document.head.appendChild(script);
-  }, []);
+  // 4개 단계 흐름도 목록 (맛집 -> 관광지 -> 카페 -> 숙소)
+  const flowSteps = [
+    { id: 'step-food', label: '맛집', spot: foodSpot, icon: '🍜' },
+    { id: 'step-tour', label: '관광지', spot: tourSpot, icon: '🌊' },
+    { id: 'step-cafe', label: '카페', spot: cafeSpot, icon: '☕' },
+    { id: 'step-stay', label: '숙소', spot: staySpot, icon: '🛏️' },
+  ];
+
+  // 현재 선택된 스팟의 흐름도 인덱스 계산 (0, 1, 2, 3)
+  const activeSpotIndex = Math.max(
+    0,
+    flowSteps.findIndex((item) => item.spot?.contentid === selectedSpot?.contentid)
+  );
+
+  // WORK 모드 흐름도 노드 (추천 워크스페이스 4선)
+  const workNodes = workspaces.slice(0, 4);
+  const activeWorkIndex = Math.max(
+    0,
+    workNodes.findIndex((ws) => ws.id === selectedWorkspace?.id)
+  );
 
   return (
-    <div className="relative w-full h-80 bg-slate-100 overflow-hidden border-b border-slate-200">
-      {/* 인터랙티브 맵 캔버스 영역 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-sky-50/60 via-indigo-50/30 to-slate-100">
-        {/* 부산 지형 무드 배경 격자 및 해안선 그래픽 */}
-        <svg className="w-full h-full opacity-60 pointer-events-none" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-              <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#CBD5E1" strokeWidth="1" />
-            </pattern>
-            <linearGradient id="routeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#0EA5E9" />
-              <stop offset="50%" stopColor="#F97316" />
-              <stop offset="100%" stopColor="#A855F7" />
-            </linearGradient>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-          {/* 부산 바다 & 해안 웨이브 무드 */}
-          <path
-            d="M -50,220 Q 80,180 200,240 T 450,200 L 450,350 L -50,350 Z"
-            fill="#38BDF8"
-            opacity="0.18"
-          />
-          <path
-            d="M -50,250 Q 120,220 250,260 T 450,240 L 450,350 L -50,350 Z"
-            fill="#0284C7"
-            opacity="0.14"
-          />
-        </svg>
+    <div className="relative w-full bg-white border-b border-slate-200 px-4 pt-3 pb-3 shadow-xs">
+      {/* 상단: 거점 뱃지 및 마이크로 투어 안내 */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center space-x-1.5">
+          <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
+          <span className="text-xs font-bold text-slate-800">
+            {mode === 'WALK' ? '퇴근길 30분 루트 흐름도' : '추천 워크스페이스 동선'}
+          </span>
+        </div>
 
-        {/* WALK 모드: 30분 타임어택 코스 라우팅 Polyline 연결선 (SVG) */}
+        <div className="flex items-center space-x-1.5 text-[11px] text-cyan-800 bg-cyan-50 px-2.5 py-0.5 rounded-full border border-cyan-200">
+          <Compass className="w-3 h-3 text-cyan-600 animate-spin" style={{ animationDuration: '12s' }} />
+          <span className="font-bold">{selectedHub.name.split(' ')[0]} 중심</span>
+        </div>
+      </div>
+
+      {/* 2. 중앙 흐름도 캔버스 영역 (수평선 + 4대 노드 + 선 위 캐릭터 위치) */}
+      <div className="relative w-full py-8 my-1 flex items-center justify-center">
+        {/* 중앙 관통 수평 실선 (이미지의 깔끔한 실선) */}
+        <div className="absolute left-[8%] right-[8%] h-[3px] bg-slate-700 rounded-full z-0" />
+
+        {/* WALK 모드 흐름도 노드 4종: [맛집] [관광지] [카페] [숙소] */}
         {mode === 'WALK' && (
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-10">
-            <path
-              d="M 90,190 Q 190,130 310,180"
-              fill="none"
-              stroke="url(#routeGrad)"
-              strokeWidth="4"
-              strokeDasharray="6 6"
-              className="animate-pulse"
-            />
-            {/* 동선 진행 애니메이션 점 */}
-            <circle cx="200" cy="155" r="4" fill="#F97316">
-              <animate attributeName="opacity" values="0.3;1;0.3" dur="1.5s" repeatCount="indefinite" />
-            </circle>
-          </svg>
-        )}
+          <div className="relative w-full flex items-center justify-between px-4 z-10">
+            {flowSteps.map((step, idx) => {
+              const isCurrent = activeSpotIndex === idx;
+              const hasCoupon = step.spot?.partnerBenefit;
 
-        {/* WORK 모드 마커 렌더링 */}
-        {mode === 'WORK' && (
-          <div className="absolute inset-0 p-6 flex flex-wrap items-center justify-around z-20">
-            {workspaces.slice(0, 4).map((ws, i) => {
-              const isSelected = selectedWorkspace?.id === ws.id;
               return (
-                <button
-                  key={ws.id}
-                  onClick={() => onSelectWorkspace(ws)}
-                  style={{
-                    transform: `translate(${(i % 2) * 20 - 10}px, ${i * 12 - 10}px)`,
-                  }}
-                  className={`group relative flex flex-col items-center transition-transform active:scale-95 ${
-                    isSelected ? 'scale-110 z-30' : 'opacity-90 hover:opacity-100'
-                  }`}
+                <div
+                  key={step.id}
+                  onClick={() => step.spot && onSelectSpot(step.spot)}
+                  className="relative flex flex-col items-center cursor-pointer group flex-1"
                 >
+                  {/* 현재 위치 캐릭터 표시 (선 위에서 사뿐히 떠 있음) */}
+                  {isCurrent && (
+                    <div className="absolute -top-14 flex flex-col items-center animate-bounce z-30 pointer-events-none">
+                      {/* 귀여운 캐릭터 아바타 */}
+                      <div className="relative">
+                        <div
+                          className={`w-11 h-11 rounded-2xl bg-gradient-to-tr ${species.baseColor} border-2 border-white shadow-md flex items-center justify-center text-xl`}
+                        >
+                          {species.icon}
+                        </div>
+                        {character && (
+                          <span className="absolute -bottom-1 -right-1 bg-amber-500 text-white text-[9px] font-black px-1 rounded-full border border-white">
+                            Lv.{character.level}
+                          </span>
+                        )}
+                      </div>
+                      {/* 하단 위치 가리킴 역삼각형 포인터 */}
+                      <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-slate-800 mt-0.5" />
+                    </div>
+                  )}
+
+                  {/* 원형 노드 (이미지와 동일한 깔끔한 원형 디자인) */}
                   <div
-                    className={`px-2 py-1 rounded-full text-[10px] font-bold shadow-md flex items-center space-x-1 mb-1 border transition-all ${
-                      isSelected
-                        ? 'bg-cyan-500 text-white border-cyan-400 shadow-cyan-500/40 scale-105'
-                        : 'bg-white/95 text-slate-700 border-slate-200'
+                    className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 border-2 ${
+                      isCurrent
+                        ? 'bg-slate-700 border-slate-900 ring-4 ring-cyan-400/40 scale-110 shadow-lg'
+                        : 'bg-[#64748B] border-slate-600 hover:bg-slate-600 shadow-md group-hover:scale-105'
                     }`}
                   >
-                    <Coffee className="w-2.5 h-2.5" />
-                    <span className="truncate max-w-[80px]">{ws.name.split(' ')[0]}</span>
+                    <span className="text-white text-xs font-bold">{step.icon}</span>
                   </div>
-                  <div
-                    className={`w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all ${
-                      isSelected
-                        ? 'bg-cyan-500 border-white text-white ring-4 ring-cyan-500/30'
-                        : 'bg-white border-cyan-500 text-cyan-600 shadow-sm'
-                    }`}
-                  >
-                    <MapPin className="w-3.5 h-3.5" />
+
+                  {/* 노드 하단 텍스트 레이블 (맛집 / 관광지 / 카페 / 숙소) */}
+                  <div className="mt-2.5 flex flex-col items-center">
+                    <span
+                      className={`text-xs font-black transition-colors ${
+                        isCurrent ? 'text-slate-950 font-extrabold underline decoration-cyan-500 decoration-2' : 'text-slate-700'
+                      }`}
+                    >
+                      {step.label}
+                    </span>
+
+                    {/* 제휴 쿠폰 뱃지 */}
+                    {hasCoupon && (
+                      <span className="mt-0.5 px-1 py-0.2 bg-amber-400 text-slate-950 text-[9px] font-black rounded shadow-xs animate-pulse">
+                        쿠폰
+                      </span>
+                    )}
                   </div>
-                </button>
+                </div>
               );
             })}
           </div>
         )}
 
-        {/* WALK 모드: 1, 2, 3 번호 묶음 라우팅 스팟 마커 */}
-        {mode === 'WALK' && activeCourse && (
-          <div className="absolute inset-0 z-20 pointer-events-auto">
-            {activeCourse.spots.map((item, index) => {
-              // 1: 맛집 (좌측), 2: 산책 (중앙 상단), 3: 숙소 (우측)
-              const positions = [
-                { left: '20%', top: '55%' },
-                { left: '48%', top: '25%' },
-                { left: '78%', top: '52%' },
-              ];
-              const pos = positions[index] || { left: '50%', top: '50%' };
-              const isSelected = selectedSpot?.contentid === item.spot.contentid;
+        {/* WORK 모드 흐름도: 워크스페이스 4종 노드 */}
+        {mode === 'WORK' && (
+          <div className="relative w-full flex items-center justify-between px-4 z-10">
+            {workNodes.map((ws, idx) => {
+              const isCurrent = activeWorkIndex === idx;
 
               return (
                 <div
-                  key={item.spot.contentid}
-                  style={{ left: pos.left, top: pos.top }}
-                  className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center cursor-pointer"
-                  onClick={() => onSelectSpot(item.spot)}
+                  key={ws.id}
+                  onClick={() => onSelectWorkspace(ws)}
+                  className="relative flex flex-col items-center cursor-pointer group flex-1"
                 >
-                  {/* 스팟 명칭 뱃지 */}
+                  {/* 현재 위치 캐릭터 표시 */}
+                  {isCurrent && (
+                    <div className="absolute -top-14 flex flex-col items-center animate-bounce z-30 pointer-events-none">
+                      <div className="relative">
+                        <div
+                          className={`w-11 h-11 rounded-2xl bg-gradient-to-tr ${species.baseColor} border-2 border-white shadow-md flex items-center justify-center text-xl`}
+                        >
+                          {species.icon}
+                        </div>
+                        {character && (
+                          <span className="absolute -bottom-1 -right-1 bg-cyan-600 text-white text-[9px] font-black px-1 rounded-full border border-white">
+                            Lv.{character.level}
+                          </span>
+                        )}
+                      </div>
+                      <div className="w-0 h-0 border-l-[5px] border-l-transparent border-r-[5px] border-r-transparent border-t-[6px] border-t-slate-800 mt-0.5" />
+                    </div>
+                  )}
+
+                  {/* 원형 노드 */}
                   <div
-                    className={`px-2 py-0.5 rounded-full text-[10px] font-bold shadow-md mb-1 whitespace-nowrap border flex items-center space-x-1 ${
-                      item.step === 1
-                        ? 'bg-orange-500 text-white border-orange-400'
-                        : item.step === 2
-                        ? 'bg-cyan-500 text-slate-950 border-cyan-300'
-                        : 'bg-purple-600 text-white border-purple-400'
-                    } ${isSelected ? 'ring-2 ring-white scale-105' : ''}`}
+                    className={`w-11 h-11 rounded-full flex items-center justify-center transition-all duration-200 border-2 ${
+                      isCurrent
+                        ? 'bg-cyan-600 border-cyan-800 ring-4 ring-cyan-400/40 scale-110 shadow-lg'
+                        : 'bg-[#64748B] border-slate-600 hover:bg-slate-600 shadow-md group-hover:scale-105'
+                    }`}
                   >
-                    <span>
-                      {item.step}. {item.role}
-                    </span>
-                    {item.spot.partnerBenefit && (
-                      <span className="bg-yellow-400 text-slate-950 px-1 rounded text-[9px] font-black animate-bounce">
-                        쿠폰
-                      </span>
-                    )}
+                    <Coffee className="w-4 h-4 text-white" />
                   </div>
 
-                  {/* 마커 핀 */}
-                  <div
-                    className={`w-7 h-7 rounded-full flex items-center justify-center font-extrabold text-xs shadow-lg transition-transform ${
-                      item.step === 1
-                        ? 'bg-gradient-to-tr from-orange-600 to-amber-400 text-white'
-                        : item.step === 2
-                        ? 'bg-gradient-to-tr from-cyan-600 to-sky-300 text-slate-950'
-                        : 'bg-gradient-to-tr from-purple-700 to-indigo-400 text-white'
-                    } ${isSelected ? 'scale-125 ring-4 ring-white/40' : 'hover:scale-110'}`}
-                  >
-                    {item.step}
+                  {/* 노드 하단 워크스페이스 명칭 */}
+                  <div className="mt-2.5 flex flex-col items-center">
+                    <span
+                      className={`text-xs font-bold truncate max-w-[70px] ${
+                        isCurrent ? 'text-cyan-700 font-extrabold' : 'text-slate-700'
+                      }`}
+                    >
+                      {ws.name.split(' ')[0]}
+                    </span>
+                    <span className="text-[10px] text-slate-400">{ws.category}</span>
                   </div>
                 </div>
               );
@@ -200,29 +223,18 @@ export default function MapContainer({
         )}
       </div>
 
-      {/* 우측 상단 모드 & 나침반 표시 */}
-      <div className="absolute top-3 right-3 z-30 flex flex-col items-end space-y-1.5">
-        <div className="px-2.5 py-1 rounded-full bg-white/95 border border-slate-200 text-[11px] font-bold text-cyan-700 flex items-center space-x-1 shadow-sm">
-          <Compass className="w-3.5 h-3.5 text-cyan-600 animate-spin" style={{ animationDuration: '10s' }} />
-          <span>{selectedHub.name.split(' ')[0]} 중심</span>
-        </div>
-        <div className="text-[10px] text-slate-500 bg-white/90 px-2 py-0.5 rounded border border-slate-200 shadow-xs">
-          반경 3km 마이크로 투어
-        </div>
-      </div>
-
-      {/* 지도 하단: 카카오 길찾기 바로가기 바 */}
-      <div className="absolute bottom-2 left-3 right-3 z-30 flex items-center justify-between pointer-events-auto">
-        <div className="bg-white/95 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-200 flex items-center space-x-2 text-xs text-slate-700 shadow-sm">
-          <Navigation className="w-3.5 h-3.5 text-cyan-600" />
-          <span className="font-medium">
+      {/* 3. 하단: 현재 선택된 장소 상세 명칭 & 카카오 길찾기 바로가기 바 */}
+      <div className="mt-3 pt-2.5 border-t border-slate-200 flex items-center justify-between">
+        <div className="flex items-center space-x-2 text-xs text-slate-800 font-bold truncate max-w-[65%]">
+          <Navigation className="w-3.5 h-3.5 text-cyan-600 flex-shrink-0" />
+          <span className="truncate">
             {mode === 'WORK'
               ? selectedWorkspace?.name || '워크스페이스 선택'
-              : selectedSpot?.title || '타임어택 코스 동선'}
+              : selectedSpot?.title || (flowSteps[activeSpotIndex]?.spot?.title ?? '타임어택 코스')}
           </span>
         </div>
 
-        {/* 카카오맵 길찾기 웹 링크 연동 */}
+        {/* 카카오맵 길찾기 웹 링크 연동 (노란색 버튼) */}
         <a
           href={
             selectedSpot
@@ -233,7 +245,7 @@ export default function MapContainer({
           }
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-yellow-400 hover:bg-yellow-300 text-slate-950 font-bold text-xs shadow-lg transition-transform active:scale-95"
+          className="flex items-center space-x-1 px-3 py-1.5 rounded-xl bg-[#FEE500] hover:bg-[#FADA0A] text-[#191919] font-bold text-xs shadow-sm transition-transform active:scale-95 flex-shrink-0"
         >
           <span>카카오 길찾기</span>
           <ExternalLink className="w-3 h-3" />

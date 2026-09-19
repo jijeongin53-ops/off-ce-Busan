@@ -14,6 +14,7 @@ import LoginModal from '@/components/LoginModal';
 import CharacterCreateModal from '@/components/CharacterCreateModal';
 import LevelUpRewardModal from '@/components/LevelUpRewardModal';
 import CharacterWidget from '@/components/CharacterWidget';
+import CharacterProfileModal from '@/components/CharacterProfileModal';
 
 import {
   AppMode,
@@ -42,6 +43,7 @@ export default function Home() {
   // 모달 제어 상태
   const [isLoginModalOpen, setIsLoginModalOpen] = useState<boolean>(false);
   const [isCharacterCreateOpen, setIsCharacterCreateOpen] = useState<boolean>(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState<boolean>(false);
   const [levelUpTarget, setLevelUpTarget] = useState<number | null>(null);
 
   // 워크스페이스 데이터 및 시트 연동 상태
@@ -256,9 +258,10 @@ export default function Home() {
         character={character}
         onOpenLogin={() => setIsLoginModalOpen(true)}
         onTriggerLevelUpModal={(lvl) => setLevelUpTarget(lvl)}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
       />
 
-      {/* 2. 인터랙티브 지도 (카카오맵 연동 + 하이브리드 동선 캔버스) */}
+      {/* 2. 인터랙티브 지도 / 흐름도 (수평 선 위의 4단계 동선 + 캐릭터 위치 표시) */}
       <MapContainer
         mode={currentMode === 'WORK' ? 'WORK' : 'WALK'}
         selectedHub={selectedHub}
@@ -277,6 +280,7 @@ export default function Home() {
             setActiveBenefit(activeCourse.partnerBenefit);
           }
         }}
+        character={character}
       />
 
       {/* 3. 모드별 콘텐츠 섹션 */}
@@ -340,6 +344,17 @@ export default function Home() {
         onClose={() => setIsLoginModalOpen(false)}
         onLoginSuccess={handleLoginSuccess}
       />
+
+      {/* 5-1. SD 동물 캐릭터 상세 프로필 모달 (캐릭터 클릭 시 오픈) */}
+      {currentUser && character && (
+        <CharacterProfileModal
+          user={currentUser}
+          character={character}
+          isOpen={isProfileModalOpen}
+          onClose={() => setIsProfileModalOpen(false)}
+          onTriggerLevelUpModal={(lvl) => setLevelUpTarget(lvl)}
+        />
+      )}
 
       {/* 6. SD 동물 캐릭터 최초 1회 생성 모달 */}
       {currentUser && (

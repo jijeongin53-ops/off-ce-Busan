@@ -10,6 +10,7 @@ interface CharacterWidgetProps {
   character: CharacterProfile | null;
   onOpenLogin: () => void;
   onTriggerLevelUpModal?: (targetLevel: number) => void;
+  onOpenProfile?: () => void;
 }
 
 export default function CharacterWidget({
@@ -17,6 +18,7 @@ export default function CharacterWidget({
   character,
   onOpenLogin,
   onTriggerLevelUpModal,
+  onOpenProfile,
 }: CharacterWidgetProps) {
   // 로그인하지 않은 경우 로그인 유도 카드
   if (!user || !character) {
@@ -59,15 +61,24 @@ export default function CharacterWidget({
     Math.max(0, Math.round(((character.points - prevLevelReq) / (nextLevelReq - prevLevelReq)) * 100))
   );
 
+  // 착용 중인 아이템 여부 확인
+  const hasEquippedItems = Boolean(
+    character.equipped.headwear || character.equipped.outfit || character.equipped.accessory
+  );
+
   return (
-    <div className="mx-4 mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-white via-sky-50/70 to-cyan-50/80 border border-cyan-200/90 shadow-sm relative overflow-hidden">
+    <div
+      onClick={onOpenProfile}
+      className="mx-4 mt-3 p-3.5 rounded-2xl bg-gradient-to-r from-white via-sky-50/70 to-cyan-50/80 border border-cyan-200/90 shadow-sm relative overflow-hidden cursor-pointer hover:shadow-md hover:border-cyan-300 transition-all group"
+      title="클릭하여 캐릭터 프로필 및 착용 장비 보기"
+    >
       {/* 배경 장식 광선 */}
       <div className="absolute top-0 right-0 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none" />
 
       <div className="flex items-center justify-between relative z-10">
         <div className="flex items-center space-x-3">
-          {/* 캐릭터 SD 아바타 및 레벨 뱃지 */}
-          <div className="relative">
+          {/* 캐릭터 SD 아바타 및 레벨 뱃지 (클릭 시 프로필 열람) */}
+          <div className="relative group-hover:scale-105 transition-transform">
             <div
               className={`w-12 h-12 rounded-2xl bg-gradient-to-tr ${species.baseColor} flex items-center justify-center text-2xl shadow-md`}
             >
@@ -81,31 +92,38 @@ export default function CharacterWidget({
           {/* 캐릭터 정보 및 착용 아이템 */}
           <div>
             <div className="flex items-center space-x-1.5">
-              <h3 className="text-xs font-bold text-slate-800">{character.name}</h3>
+              <h3 className="text-xs font-bold text-slate-800 group-hover:text-cyan-600 transition-colors">
+                {character.name}
+              </h3>
               <span className="text-[10px] text-slate-500">({user.name} 님의 파트너)</span>
+              <span className="text-[9px] text-cyan-600 bg-cyan-100/70 px-1 py-0.2 rounded font-semibold flex items-center">
+                프로필 ›
+              </span>
             </div>
 
-            {/* 착용 중인 아이템 태그 */}
+            {/* 착용 중인 아이템 태그: 모자없음이 아니고 '아이템 없음'으로 표기 */}
             <div className="flex items-center space-x-1 mt-1">
-              {character.equipped.headwear ? (
-                <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded border border-amber-200">
+              {character.equipped.headwear && (
+                <span className="text-[9px] bg-amber-100 text-amber-800 px-1.5 py-0.2 rounded border border-amber-200 font-medium">
                   {character.equipped.headwear}
-                </span>
-              ) : (
-                <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.2 rounded border border-slate-200">
-                  모자 없음
                 </span>
               )}
 
               {character.equipped.outfit && (
-                <span className="text-[9px] bg-sky-100 text-sky-800 px-1.5 py-0.2 rounded border border-sky-200">
+                <span className="text-[9px] bg-sky-100 text-sky-800 px-1.5 py-0.2 rounded border border-sky-200 font-medium">
                   {character.equipped.outfit}
                 </span>
               )}
 
               {character.equipped.accessory && (
-                <span className="text-[9px] bg-purple-100 text-purple-800 px-1.5 py-0.2 rounded border border-purple-200">
+                <span className="text-[9px] bg-purple-100 text-purple-800 px-1.5 py-0.2 rounded border border-purple-200 font-medium">
                   {character.equipped.accessory}
+                </span>
+              )}
+
+              {!hasEquippedItems && (
+                <span className="text-[9px] bg-slate-100 text-slate-500 px-1.5 py-0.2 rounded border border-slate-200">
+                  아이템 없음
                 </span>
               )}
             </div>
