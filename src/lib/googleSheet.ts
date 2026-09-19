@@ -86,33 +86,100 @@ export async function fetchWorkspacesFromSheet(): Promise<{ workspaces: Workspac
 
 // 구글 시트에 사용자 워케이션 리뷰/방명록 로그 추가
 export async function appendLogToSheet(log: WorkationLog): Promise<{ success: boolean; fromGoogle: boolean; message: string }> {
+  return appendDataToSheet({
+    type: 'review',
+    ...log,
+  });
+}
+
+// 오프스 부산 다중 탭 자동 분기 저장 인터페이스
+export interface SheetPayload {
+  type: 'review' | 'coupon' | 'course' | 'workspace';
+  [key: string]: any;
+}
+
+// 여러 개의 시트 탭(Guestbook_Reviews, CouponLogs, TimeAttackCourses)에 각각 나누어 자동 저장
+export async function appendDataToSheet(payload: SheetPayload): Promise<{ success: boolean; fromGoogle: boolean; message: string }> {
+  const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
   const sheetId = process.env.GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
+  const appsScriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
+
+  // 1. Google Apps Script Web App URL이 설정된 경우 실시간 웹훅 호출
+  if (appsScriptUrl) {
+    try {
+      const res = await fetch(appsScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) {
+        return {
+          success: true,
+          fromGoogle: true,
+          message: `구글 스프레드시트 [${payload.type}] 탭에 실시간 기록되었습니다.`,
+        };
+      }
+    } catch (err) {
+      console.warn('Apps Script Webhook failed, trying Service Account...', err);
+    }
+  }
+
+  // 2. Google Service Account JWT 인증 시도
   const auth = getGoogleAuth();
 
-  const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
-  const rowData = [
-    timestamp,
-    log.userName || '익명의 노마드',
-    log.workspaceName || '미지정',
-    log.visitedCourseTitle || '자율 탐방',
-    log.rating || 5,
-    log.reviewComment || '',
-  ];
-
   if (!auth) {
-    // 키가 없을 때는 성공 응답을 주되 시트 키 설정 안내 플래그 전달
     return {
       success: true,
       fromGoogle: false,
-      message: '로컬 시뮬레이션 저장 완료 (실제 시트 저장을 위해 GOOGLE_PRIVATE_KEY 환경변수 설정이 필요합니다)',
+      message: `로컬 시뮬레이션 저장 완료 (시트 [${payload.type}] 탭에 자동 저장 대기 중)`,
     };
   }
 
   try {
     const sheets = google.sheets({ version: 'v4', auth });
+    let range = 'Guestbook_Reviews!A:F';
+    let rowData: any[] = [];
+
+    if (payload.type === 'review') {
+      range = 'Guestbook_Reviews!A:F';
+      rowData = [
+        timestamp,
+        payload.userName || '익명의 노마드',
+        payload.workspaceName || '미지정',
+        payload.visitedCourseTitle || '자율 탐방',
+        payload.rating || 5,
+        payload.reviewComment || '',
+      ];
+    } else if (payload.type === 'coupon') {
+      range = 'CouponLogs!A:F';
+      rowData = [
+        timestamp,
+        payload.businessName || '',
+        payload.couponCode || '',
+        payload.discountRate || '',
+        payload.courseTitle || '직접 발급',
+        payload.userAgent || 'Web Client',
+      ];
+    } else if (payload.type === 'course') {
+      range = 'TimeAttackCourses!A:K';
+      rowData = [
+        timestamp,
+        payload.area || '부산',
+        payload.weather || '맑음',
+        payload.offTime || '18:00',
+        payload.courseTitle || '',
+        payload.estimatedMinutes || 30,
+        payload.totalDistanceKm || 2.0,
+        payload.spot1 || '',
+        payload.spot2 || '',
+        payload.spot3 || '',
+        payload.benefit || '',
+      ];
+    }
+
     await sheets.spreadsheets.values.append({
       spreadsheetId: sheetId,
-      range: 'Reviews!A:F',
+      range,
       valueInputOption: 'USER_ENTERED',
       requestBody: {
         values: [rowData],
@@ -122,7 +189,7 @@ export async function appendLogToSheet(log: WorkationLog): Promise<{ success: bo
     return {
       success: true,
       fromGoogle: true,
-      message: '구글 스프레드시트에 실시간 기록되었습니다.',
+      message: `구글 스프레드시트 [${range.split('!')[0]}] 탭에 실시간 기록되었습니다.`,
     };
   } catch (error: any) {
     console.error('Google Sheet Append Error:', error);
@@ -133,3 +200,4 @@ export async function appendLogToSheet(log: WorkationLog): Promise<{ success: bo
     };
   }
 }
+

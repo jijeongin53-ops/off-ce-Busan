@@ -28,10 +28,12 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
     setResultMsg(null);
 
     try {
+      // 1) Guestbook_Reviews 탭에 방명록 저장
       const res = await fetch('/api/sheet', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          type: 'review',
           userName,
           workspaceName: workspace?.name || '부산 워크스페이스',
           visitedCourseTitle: course?.title || '30분 타임어택 코스',
@@ -40,7 +42,29 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
         }),
       });
 
+      // 2) TimeAttackCourses 탭에 코스 상세 정보 자동 동기화
+      if (course) {
+        fetch('/api/sheet', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'course',
+            area: workspace?.area || '부산',
+            weather: '맑음',
+            offTime: '18:00',
+            courseTitle: course.title,
+            estimatedMinutes: course.estimatedMinutes,
+            totalDistanceKm: course.totalDistanceKm,
+            spot1: course.spots[0]?.spot.title || '',
+            spot2: course.spots[1]?.spot.title || '',
+            spot3: course.spots[2]?.spot.title || '',
+            benefit: course.partnerBenefit?.title || '',
+          }),
+        }).catch((e) => console.warn('Course sheet sync skipped:', e));
+      }
+
       const data = await res.json();
+
       if (data.success) {
         setResultMsg({
           success: true,

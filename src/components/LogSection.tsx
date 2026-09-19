@@ -85,6 +85,67 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
         </div>
       </div>
 
+      {/* 5개 시트 탭 자동 분기 저장 구조 안내 */}
+      <div className="p-4 rounded-3xl bg-slate-900/90 border border-cyan-500/30 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-1.5">
+            <span className="text-xs font-black text-cyan-400 uppercase tracking-wider">
+              자동 분기 저장 시트 탭 (5종)
+            </span>
+          </div>
+          <span className="text-[10px] bg-cyan-500/10 text-cyan-300 px-2 py-0.5 rounded border border-cyan-500/20">
+            자동 매핑 완료
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 gap-2 text-xs">
+          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-sky-400">1. Workspaces</span>
+              <p className="text-[11px] text-slate-400">부산 원도심 워크스페이스 마스터 (카페·오피스)</p>
+            </div>
+            <span className="text-[10px] text-slate-500 font-mono">14개 열</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-orange-400">2. TimeAttackCourses</span>
+              <p className="text-[11px] text-slate-400">30분 타임어택 퇴근길 코스 조합 이력</p>
+            </div>
+            <span className="text-[10px] text-slate-500 font-mono">11개 열</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-amber-400">3. PartnerBenefits</span>
+              <p className="text-[11px] text-slate-400">부산 체험 & F&B 로컬 기업 마케팅 제휴 혜택</p>
+            </div>
+            <span className="text-[10px] text-slate-500 font-mono">9개 열</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-emerald-400">4. CouponLogs</span>
+              <p className="text-[11px] text-slate-400">할인 쿠폰 발급 및 코드 복사 실시간 로그</p>
+            </div>
+            <span className="text-[10px] text-slate-500 font-mono">6개 열</span>
+          </div>
+
+          <div className="p-2.5 rounded-xl bg-slate-950/70 border border-slate-800 flex items-center justify-between">
+            <div>
+              <span className="font-bold text-purple-400">5. Guestbook_Reviews</span>
+              <p className="text-[11px] text-slate-400">노마드 방문 후기, 별점 및 퇴근길 소감</p>
+            </div>
+            <span className="text-[10px] text-slate-500 font-mono">6개 열</span>
+          </div>
+        </div>
+
+        <div className="pt-2 text-[11px] text-slate-400 bg-slate-950/40 p-2.5 rounded-xl border border-slate-800/80 leading-relaxed">
+          💡 <strong>구글 시트 10초 자동 세팅 팁:</strong> 구글 시트 상단의 <code>확장 프로그램 ➔ Apps Script</code>에 프로젝트 내 <code>scripts/google_apps_script.js</code> 코드를 붙여넣고 [실행]을 누르면 5개 탭과 헤더 서식, 초기 데이터가 1초 만에 자동 생성됩니다!
+        </div>
+      </div>
+
+
       {/* 방명록 작성 CTA */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-bold text-white flex items-center space-x-1.5">

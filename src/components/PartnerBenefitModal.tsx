@@ -18,7 +18,21 @@ export default function PartnerBenefitModal({ benefit, onClose }: PartnerBenefit
     navigator.clipboard.writeText(benefit.couponCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+
+    // 구글 스프레드시트 CouponLogs 탭에 실시간 자동 기록
+    fetch('/api/sheet', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        type: 'coupon',
+        businessName: benefit.businessName,
+        couponCode: benefit.couponCode,
+        discountRate: benefit.discountRate,
+        userAgent: typeof window !== 'undefined' ? window.navigator.userAgent.slice(0, 50) : 'Web',
+      }),
+    }).catch((err) => console.warn('Coupon log sheet sync skipped:', err));
   };
+
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
