@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Flame,
   Clock,
@@ -14,6 +14,9 @@ import {
   Sun,
   CloudRain,
   Share2,
+  Volume2,
+  Square,
+  Play,
 } from 'lucide-react';
 import { TimeAttackCourse, TourSpot, PartnerBenefit } from '@/types';
 
@@ -46,6 +49,73 @@ export default function WalkSection({
   isLocating,
   isUsingMyLocation,
 }: WalkSectionProps) {
+  // 실제 오디오 도슨트 재생 상태 (재생 중인 스팟 contentid)
+  const [playingSpotId, setPlayingSpotId] = useState<string | null>(null);
+
+  // 컴포넌트 언마운트 시 음성 자동 정지
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
+
+  // 실제 오디오 도슨트 재생/정지 핸들러 (Web Speech API 활용한 고품질 한국어 음성 실시간 낭독)
+  const handleToggleAudio = (spotId: string, scriptText: string, audioUrl?: string) => {
+    if (typeof window === 'undefined') return;
+
+    // 이미 재생 중인 경우 정지
+    if (playingSpotId === spotId) {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.cancel();
+      }
+      setPlayingSpotId(null);
+      return;
+    }
+
+    // 이전 재생 중인 음성 정지
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+
+    setPlayingSpotId(spotId);
+
+    // 1) 브라우저 Web Speech API로 실제 한국어 음성 도슨트 출력
+    if ('speechSynthesis' in window) {
+      const utterance = new SpeechSynthesisUtterance(scriptText);
+      utterance.lang = 'ko-KR';
+      utterance.rate = 0.92; // 감미롭고 차분한 도슨트 해설 톤
+      utterance.pitch = 1.0;
+
+      // 한국어 음성 우선 매핑
+      const voices = window.speechSynthesis.getVoices();
+      const koVoice = voices.find((v) => v.lang.includes('ko') || v.lang.includes('KR'));
+      if (koVoice) {
+        utterance.voice = koVoice;
+      }
+
+      utterance.onend = () => {
+        setPlayingSpotId(null);
+      };
+
+      utterance.onerror = () => {
+        setPlayingSpotId(null);
+      };
+
+      window.speechSynthesis.speak(utterance);
+    } else if (audioUrl) {
+      // 2) Fallback: HTML5 Audio 객체 재생
+      try {
+        const audio = new Audio(audioUrl);
+        audio.play().catch(() => {});
+        audio.onended = () => setPlayingSpotId(null);
+      } catch (e) {
+        setPlayingSpotId(null);
+      }
+    }
+  };
+
   return (
     <div className="p-4 space-y-4">
       {/* 타임어택 헤더 & 현재 위치 추천 버튼 (상단 "칼퇴 완료! 바로 아래"로 이동됨) */}
@@ -188,26 +258,60 @@ export default function WalkSection({
 
                   {/* ★ 한국관광공사 오디(Odii) 1분 퇴근길 오디오 도슨트 플레이어 연동 ★ */}
                   {item.step === 2 && item.spot.audioGuide && (
-                    <div className="mt-2 p-2 rounded-xl bg-purple-50 border border-purple-200 text-[11px]">
+                    <div className="mt-2 p-2.5 rounded-xl bg-purple-50/90 border border-purple-200 text-[11px] shadow-xs transition-all">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-1.5 text-purple-800 font-bold">
-                          <span>🎧 {item.spot.audioGuide.audioTitle}</span>
-                          <span className="text-[10px] text-purple-600">({item.spot.audioGuide.duration})</span>
+                        <div className="flex items-center space-x-1.5 text-purple-900 font-bold">
+                          <Volume2
+                            className={`w-4 h-4 text-purple-600 flex-shrink-0 ${
+                              playingSpotId === item.spot.contentid ? 'animate-bounce text-purple-800' : ''
+                            }`}
+                          />
+                          <span className="truncate max-w-[170px]">{item.spot.audioGuide.audioTitle}</span>
+                          <span className="text-[10px] text-purple-600 font-semibold flex-shrink-0">
+                            ({item.spot.audioGuide.duration})
+                          </span>
                         </div>
                         <button
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            alert(`🎧 [오디오 도슨트 재생 중]\n\n"${item.spot.audioGuide?.scriptContent}"`);
+                            handleToggleAudio(
+                              item.spot.contentid,
+                              item.spot.audioGuide?.scriptContent || '부산의 아름다운 풍경과 함께하는 힐링 오디오 가이드입니다.',
+                              item.spot.audioGuide?.audioUrl
+                            );
                           }}
-                          className="px-2 py-0.5 rounded-lg bg-purple-600 hover:bg-purple-500 text-white text-[10px] font-bold shadow active:scale-95 transition-transform"
+                          className={`px-2.5 py-1 rounded-lg text-white text-[10px] font-bold shadow-xs active:scale-95 transition-all flex items-center space-x-1 flex-shrink-0 ${
+                            playingSpotId === item.spot.contentid
+                              ? 'bg-rose-500 hover:bg-rose-600 ring-2 ring-rose-300 animate-pulse'
+                              : 'bg-purple-600 hover:bg-purple-500'
+                          }`}
                         >
-                          도슨트 듣기 ▶
+                          {playingSpotId === item.spot.contentid ? (
+                            <>
+                              <Square className="w-2.5 h-2.5 fill-current" />
+                              <span>정지 ■</span>
+                            </>
+                          ) : (
+                            <>
+                              <Play className="w-2.5 h-2.5 fill-current" />
+                              <span>도슨트 듣기 ▶</span>
+                            </>
+                          )}
                         </button>
                       </div>
-                      <p className="text-[10px] text-slate-600 mt-1 line-clamp-1 italic">
+
+                      <p className="text-[10px] text-slate-600 mt-1 line-clamp-2 italic leading-relaxed bg-white/70 p-1.5 rounded-lg border border-purple-100">
                         "{item.spot.audioGuide.scriptContent}"
                       </p>
+
+                      {/* 실제 음성 재생 중 상태 인디케이터 */}
+                      {playingSpotId === item.spot.contentid && (
+                        <div className="mt-1.5 flex items-center space-x-1.5 text-[10px] text-purple-800 font-bold animate-pulse">
+                          <span className="w-2 h-2 rounded-full bg-purple-600" />
+                          <span>🎧 오디오 도슨트가 음성으로 실제 재생되고 있습니다...</span>
+                        </div>
+                      )}
                     </div>
                   )}
 
