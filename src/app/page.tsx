@@ -99,11 +99,34 @@ export default function Home() {
       }).catch((e) => console.warn('Point sheet sync skipped:', e));
     }
 
+    // 로컬 스토리지에 캐릭터 상태 동기화 저장
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('offce_character', JSON.stringify(updatedChar));
+    }
+
     // 레벨업 발생 시 보상 선택 모달 오픈
     if (nextLevel > character.level) {
       setLevelUpTarget(nextLevel);
     }
   };
+
+  // 컴포넌트 마운트 시 로컬스토리지에서 기존 가입자 회원 및 캐릭터 정보 자동 복원
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        const storedUser = localStorage.getItem('offce_user');
+        const storedChar = localStorage.getItem('offce_character');
+        if (storedUser) {
+          setCurrentUser(JSON.parse(storedUser));
+        }
+        if (storedChar) {
+          setCharacter(JSON.parse(storedChar));
+        }
+      } catch (err) {
+        console.warn('LocalStorage user restore error:', err);
+      }
+    }
+  }, []);
 
   // 구글 시트에서 워크스페이스 목록 가져오기
   useEffect(() => {
@@ -159,17 +182,42 @@ export default function Home() {
     loadTourCourse(selectedHub, nextRainy);
   };
 
-  // 로그인 성공 시 캐릭터 생성 플로우로 전환
-  const handleLoginSuccess = (user: UserMember) => {
+  // 로그인 성공 시 기 가입자(캐릭터 보유)면 바로 복원, 신규면 캐릭터 생성 플로우로 전환
+  const handleLoginSuccess = (user: UserMember, savedChar?: CharacterProfile) => {
     setCurrentUser(user);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('offce_user', JSON.stringify(user));
+    }
     setIsLoginModalOpen(false);
-    // 최초 캐릭터 생성을 위해 모달 오픈
-    setIsCharacterCreateOpen(true);
+
+    // 기 가입자의 캐릭터가 이미 존재하는 경우 캐릭터 생성 단계를 건너뛰고 즉시 복원
+    if (savedChar) {
+      setCharacter(savedChar);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('offce_character', JSON.stringify(savedChar));
+      }
+    } else {
+      // 로컬스토리지에 캐릭터가 남아있는지 재확인
+      const storedChar = typeof window !== 'undefined' ? localStorage.getItem('offce_character') : null;
+      if (storedChar) {
+        try {
+          setCharacter(JSON.parse(storedChar));
+          return;
+        } catch (e) {
+          // ignore
+        }
+      }
+      // 캐릭터가 없는 신규 회원인 경우에만 최초 캐릭터 생성 모달 오픈
+      setIsCharacterCreateOpen(true);
+    }
   };
 
   // 캐릭터 생성 완료 핸들러
   const handleCharacterCreated = (newChar: CharacterProfile) => {
     setCharacter(newChar);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('offce_character', JSON.stringify(newChar));
+    }
     setIsCharacterCreateOpen(false);
   };
 
@@ -177,10 +225,14 @@ export default function Home() {
   const handleRewardSelected = (reward: LevelRewardOption) => {
     if (!character) return;
     const newEquipped = { ...character.equipped, [reward.category]: reward.name };
-    setCharacter({
+    const updatedChar: CharacterProfile = {
       ...character,
       equipped: newEquipped,
-    });
+    };
+    setCharacter(updatedChar);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('offce_character', JSON.stringify(updatedChar));
+    }
     setLevelUpTarget(null);
   };
 
