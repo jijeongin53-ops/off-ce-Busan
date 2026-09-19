@@ -7,8 +7,10 @@ import { Workspace, WorkationLog } from '@/types';
 import { INITIAL_WORKSPACES } from './busanData';
 
 const DEFAULT_SHEET_ID = '15X5EzmNlQJhI4fGqBD0MmB3L9jKmQhGEIDuueZEyatk';
+const DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxLJkMZPcUUPDzR0dpofSKxsWUgdMUXAP9eWClY_oqzmCOHEA_5kgh1UMp2rzAWALFqwQ/exec';
 
 // Google Sheets 인증 클라이언트 획득
+
 function getGoogleAuth() {
   const clientEmail = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL || 'sheet-bot@peo-schedule.iam.gserviceaccount.com';
   let privateKey = process.env.GOOGLE_PRIVATE_KEY;
@@ -102,9 +104,10 @@ export interface SheetPayload {
 export async function appendDataToSheet(payload: SheetPayload): Promise<{ success: boolean; fromGoogle: boolean; message: string }> {
   const timestamp = new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' });
   const sheetId = process.env.GOOGLE_SHEET_ID || DEFAULT_SHEET_ID;
-  const appsScriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL;
+  const appsScriptUrl = process.env.GOOGLE_APPS_SCRIPT_URL || DEFAULT_APPS_SCRIPT_URL;
 
   // 1. Google Apps Script Web App URL이 설정된 경우 실시간 웹훅 호출
+
   if (appsScriptUrl) {
     try {
       const res = await fetch(appsScriptUrl, {
