@@ -45,8 +45,8 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
 
   return (
     <div className="p-4 space-y-4">
-      {/* 구글 시트 백엔드 연동 정보 카드 */}
-      <div className="p-4 rounded-3xl bg-white border border-slate-200 space-y-2.5 shadow-sm">
+      {/* 구글 시트 백엔드 연동 정보 카드 (사용자 요청에 따라 비표시 처리) */}
+      {/* <div className="p-4 rounded-3xl bg-white border border-slate-200 space-y-2.5 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <Database className="w-4 h-4 text-emerald-600" />
@@ -83,10 +83,10 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
             <ExternalLink className="w-3 h-3" />
           </a>
         </div>
-      </div>
+      </div> */}
 
-      {/* 7개 시트 탭 자동 분기 저장 구조 안내 */}
-      <div className="p-4 rounded-3xl bg-white border border-cyan-200 space-y-3 shadow-sm">
+      {/* 7개 시트 탭 자동 분기 저장 구조 안내 (사용자 요청에 따라 비표시 처리) */}
+      {/* <div className="p-4 rounded-3xl bg-white border border-cyan-200 space-y-3 shadow-sm">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-1.5">
             <span className="text-xs font-black text-cyan-700 uppercase tracking-wider">
@@ -159,7 +159,7 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
         <div className="pt-2 text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-200 leading-relaxed">
           💡 <strong>구글 시트 10초 자동 세팅 팁:</strong> 구글 시트 상단의 <code>확장 프로그램 ➔ Apps Script</code>에 프로젝트 내 <code>scripts/google_apps_script.js</code> 코드를 붙여넣고 [실행]을 누르면 7개 탭과 헤더 서식, 초기 데이터가 1초 만에 자동 생성됩니다!
         </div>
-      </div>
+      </div> */}
 
 
 

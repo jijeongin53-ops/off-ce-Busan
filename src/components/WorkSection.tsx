@@ -45,18 +45,18 @@ export default function WorkSection({
           </p>
         </div>
 
-        {/* 구글 시트 백엔드 연동 뱃지 */}
-        <div
+        {/* 구글 시트 백엔드 연동 뱃지 (사용자 요청에 따라 비표시 처리) */}
+        {/* <div
           className={`flex items-center space-x-1 px-2.5 py-1 rounded-full text-[10px] font-semibold border ${
             isFromGoogle
               ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
               : 'bg-slate-100 text-cyan-800 border-slate-200'
           }`}
-          title="구글 스프레드시트 15X5EzmNlQJhI4fGqBD0MmB3L9jKmQhGEIDuueZEyatk 연동"
+          title="구글 스프레드시트 연동"
         >
           <Database className="w-3 h-3 text-emerald-600" />
           <span>{isFromGoogle ? 'Google 시트 연동됨' : '구글 시트 백엔드'}</span>
-        </div>
+        </div> */}
       </div>
 
       {/* 워크스페이스 특화 필터 토글 칩 */}
