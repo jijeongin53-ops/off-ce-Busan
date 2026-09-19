@@ -168,7 +168,7 @@ export async function fetchOdiiAudioGuide(keyword?: string): Promise<{
   }
 }
 
-// 1시간 타임어택 코스 자동 생성 (3대 공공데이터 API 결합: 맛집 ➔ 산책로[두루누비+오디] ➔ 숙소)
+// 1시간 타임어택 코스 자동 생성 (3대 공공데이터 API 결합: 맛집 ➔ 산책로[두루누비+오디] ➔ 카페 ➔ 숙소)
 export async function generateTimeAttackCourse(
   lat: number,
   lng: number,
@@ -179,7 +179,7 @@ export async function generateTimeAttackCourse(
   // 2단계: 맑으면 산책/관광지(12), 비 오면 실내문화(14)
   const secondTypeId = isRainy ? '14' : '12';
   const walkResult = await fetchLocationBasedTour({ mapX: lng, mapY: lat, contentTypeId: secondTypeId });
-  // 3단계: 숙소(32)
+  // 4단계: 숙소(32)
   const stayResult = await fetchLocationBasedTour({ mapX: lng, mapY: lat, contentTypeId: '32' });
 
   // 두루누비(Durunubi) 공인 걷기길 & 오디(Odii) 오디오 가이드 실시간 결합
@@ -188,11 +188,11 @@ export async function generateTimeAttackCourse(
     fetchOdiiAudioGuide(),
   ]);
 
+  // 1단계: 맛집 스팟
   const foodSpot = foodResult.spots[0] || SEED_COURSES[0].spots[0].spot;
-  const rawWalkSpot = walkResult.spots[0] || SEED_COURSES[0].spots[1].spot;
-  const staySpot = stayResult.spots[0] || SEED_COURSES[0].spots[2].spot;
 
   // 2단계 산책로에 두루누비와 오디오 가이드 정보 주입
+  const rawWalkSpot = walkResult.spots[0] || SEED_COURSES[0].spots[1].spot;
   const walkSpot: TourSpot = {
     ...rawWalkSpot,
     durunubiInfo: durunubiData || {
@@ -210,8 +210,25 @@ export async function generateTimeAttackCourse(
     },
   };
 
+  // 3단계: 카페 스팟 탐색 (foodResult 중 카페/베이커리/디저트 키워드가 포함된 스팟 우선 매칭, 없으면 2번째 음식점 스팟)
+  const cafeKeywordMatch = foodResult.spots.slice(1).find((s) => 
+    s.title.includes('카페') || s.title.includes('커피') || s.title.includes('베이커리') || s.title.includes('디저트') || s.title.includes('다방') || s.title.includes('제과') || s.title.includes('Coffee') || s.title.includes('Cafe')
+  );
+  const cafeSpot: TourSpot = cafeKeywordMatch || foodResult.spots[1] || (
+    lat < 35.1
+      ? SEED_COURSES[0].spots[2].spot
+      : SEED_COURSES[1].spots[2].spot
+  );
+
+  // 4단계: 숙소 스팟
+  const staySpot = stayResult.spots[0] || (
+    lat < 35.1
+      ? SEED_COURSES[0].spots[3]?.spot || SEED_COURSES[0].spots[2].spot
+      : SEED_COURSES[1].spots[3]?.spot || SEED_COURSES[1].spots[2].spot
+  );
+
   // 파트너 할인 혜택 매칭
-  const partnerBenefit = foodSpot.partnerBenefit || walkSpot.partnerBenefit || PARTNER_BENEFITS[0];
+  const partnerBenefit = foodSpot.partnerBenefit || walkSpot.partnerBenefit || cafeSpot.partnerBenefit || PARTNER_BENEFITS[0];
 
   return {
     id: `course-${Date.now()}`,
@@ -223,7 +240,8 @@ export async function generateTimeAttackCourse(
     spots: [
       { step: 1, role: '맛집', spot: foodSpot },
       { step: 2, role: '산책/문화', spot: walkSpot },
-      { step: 3, role: '숙소', spot: staySpot },
+      { step: 3, role: '카페', spot: cafeSpot },
+      { step: 4, role: '숙소', spot: staySpot },
     ],
   };
 }
@@ -348,6 +366,39 @@ function getMockTourSpots(mapX: number, mapY: number, contentTypeId?: string): T
         scriptContent: '헌책 속에 담긴 세월의 향기와 수많은 청춘들의 꿈이 머물던 책방골목의 이야기를 전해드립니다.',
         duration: '1분 20초',
       },
+    },
+    {
+      contentid: 'mock-cafe-1',
+      contenttypeid: '39',
+      title: '신기산업 (영도 오션뷰 루프탑 카페)',
+      addr1: '부산광역시 영도구 와치로51번길 2',
+      mapx: 129.0575,
+      mapy: 35.0911,
+      firstimage: 'https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80',
+      categoryLabel: '로컬 감성 카페',
+      overview: '영도 산복도로 정상에서 부산항 대교 파노라마 뷰를 감상하는 힐링 카페.',
+    },
+    {
+      contentid: 'mock-cafe-2',
+      contenttypeid: '39',
+      title: '노티스 1950 (쌀창고 갤러리 카페)',
+      addr1: '부산광역시 중구 대교로 135',
+      mapx: 129.0375,
+      mapy: 35.1098,
+      firstimage: 'https://images.unsplash.com/photo-1517502884422-41eaead166d4?w=800&q=80',
+      categoryLabel: '로컬 감성 카페',
+      overview: '1950년 쌀창고를 재생한 감성 복합문화공간.',
+    },
+    {
+      contentid: 'mock-stay-2',
+      contenttypeid: '32',
+      title: '아스티 호텔 부산역',
+      addr1: '부산광역시 동구 중앙대로 214번길 7-8',
+      mapx: 129.0416,
+      mapy: 35.1158,
+      firstimage: 'https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&q=80',
+      categoryLabel: '워케이션 감성 숙소',
+      overview: '부산역 바로 앞. 워케이션 거점센터와 연계된 프리미엄 비즈니스 호텔.',
     },
   ];
 

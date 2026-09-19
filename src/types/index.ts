@@ -81,7 +81,7 @@ export interface PartnerBenefit {
   targetSpotId?: string;     // 매칭된 관광지/음식점 ID
 }
 
-// 30분 타임어택 묶음 코스
+// 1시간 타임어택 묶음 코스
 export interface TimeAttackCourse {
   id: string;
   title: string;
@@ -89,8 +89,8 @@ export interface TimeAttackCourse {
   estimatedMinutes: number;
   totalDistanceKm: number;
   spots: {
-    step: 1 | 2 | 3;
-    role: '맛집' | '산책/문화' | '숙소';
+    step: 1 | 2 | 3 | 4;
+    role: '맛집' | '산책/문화' | '카페' | '숙소';
     spot: TourSpot;
   }[];
   partnerBenefit?: PartnerBenefit;

@@ -18,6 +18,29 @@ interface MapContainerProps {
   character?: CharacterProfile | null;
 }
 
+// 스팟 이름 간결화 헬퍼 (괄호, 부가설명, 긴 특수문자를 정돈하여 장소 실명 강조)
+function simplifySpotTitle(title?: string): string {
+  if (!title) return '';
+  // 괄호 내용 제거: "신기산업 (영도 오션뷰 루프탑 카페)" -> "신기산업"
+  let clean = title.replace(/\s*\(.*?\)/g, '').trim();
+  // " & " 또는 " / " 이후 부가수식어 간소화
+  if (clean.includes(' & ')) {
+    const parts = clean.split(' & ');
+    clean = parts[0];
+  }
+  if (clean.includes(' - ')) {
+    const parts = clean.split(' - ');
+    clean = parts[0];
+  }
+  // 영도본점, 해운대점 등 지점명도 길면 본 상호명 유지
+  clean = clean.replace(/ 영도본점| 해운대점| 광안리점/g, '');
+  clean = clean.trim();
+  if (clean.length > 8) {
+    clean = clean.slice(0, 7) + '…';
+  }
+  return clean;
+}
+
 export default function MapContainer({
   mode,
   selectedHub,
@@ -38,19 +61,17 @@ export default function MapContainer({
   // 1. WALK 모드: 사용자 요청 4단계 흐름도 노드 데이터 구성 (1: 맛집, 2: 관광지, 3: 카페, 4: 숙소)
   const foodSpot = activeCourse?.spots.find((s) => s.role === '맛집')?.spot || activeCourse?.spots[0]?.spot;
   const tourSpot = activeCourse?.spots.find((s) => s.role === '산책/문화')?.spot || activeCourse?.spots[1]?.spot;
-  const staySpot = activeCourse?.spots.find((s) => s.role === '숙소')?.spot || activeCourse?.spots[2]?.spot;
-
-  // 카페 기본 스팟 (영도/초량 거점 맞춤)
-  const cafeSpot: TourSpot = {
+  const cafeSpot = activeCourse?.spots.find((s) => s.role === '카페')?.spot || activeCourse?.spots[2]?.spot || {
     contentid: 'spot-flow-cafe',
     contenttypeid: '39',
-    title: selectedHub.name.includes('영도') ? '신기산업 (영도 오션뷰 카페)' : '초량 1941 (적산가옥 카페)',
+    title: selectedHub.name.includes('영도') ? '신기산업' : selectedHub.name.includes('해운대') ? '랑데자뷰' : '초량 1941',
     addr1: selectedHub.name.includes('영도') ? '부산광역시 영도구 와치로 51' : '부산광역시 동구 망양로 533-5',
     mapx: selectedHub.lng,
     mapy: selectedHub.lat,
     categoryLabel: '로컬 감성 카페',
     overview: '탁 트인 부산 앞바다와 함께 즐기는 시원한 드립 커피와 디저트 휴식.',
   };
+  const staySpot = activeCourse?.spots.find((s) => s.role === '숙소')?.spot || activeCourse?.spots[3]?.spot || activeCourse?.spots[2]?.spot;
 
   // 4개 단계 흐름도 목록 (맛집 -> 관광지 -> 카페 -> 숙소) 및 모던 벡터 아이콘
   const flowSteps = [
@@ -154,32 +175,47 @@ export default function MapContainer({
               })}
             </div>
 
-            {/* 2) 노드 하단 텍스트 레이블 및 쿠폰 뱃지 행 */}
-            <div className="w-full flex items-start justify-between px-6 mt-3">
+            {/* 2) 노드 하단 텍스트 레이블(역할 + 실제 장소명 실명) 및 쿠폰 뱃지 행 */}
+            <div className="w-full flex items-start justify-between px-6 mt-2.5">
               {flowSteps.map((step, idx) => {
                 const isCurrent = activeSpotIndex === idx;
                 const hasCoupon = step.spot?.partnerBenefit;
+                const spotTitle = simplifySpotTitle(step.spot?.title);
 
                 return (
                   <div
                     key={`label-${step.id}`}
                     onClick={() => step.spot && onSelectSpot(step.spot)}
-                    className="w-12 flex flex-col items-center cursor-pointer text-center"
+                    className="w-12 -mx-3 flex flex-col items-center cursor-pointer text-center group"
+                    style={{ minWidth: '72px' }}
                   >
+                    {/* 카테고리 역할 태그 (맛집, 관광지, 카페, 숙소) */}
                     <span
-                      className={`text-xs transition-colors ${
+                      className={`text-[10px] font-bold px-1.5 py-0.2 rounded-md transition-colors ${
                         isCurrent
-                          ? 'text-slate-950 font-black tracking-tight'
-                          : 'text-slate-500 font-semibold hover:text-slate-800'
+                          ? 'bg-slate-900 text-white shadow-xs'
+                          : 'bg-slate-100 text-slate-500 group-hover:text-slate-700'
                       }`}
                     >
                       {step.label}
                     </span>
 
+                    {/* 이동 루트에 해당하는 실제 장소명(실명) 표시 */}
+                    <span
+                      className={`text-[11px] leading-tight mt-1 transition-colors line-clamp-2 break-keep ${
+                        isCurrent
+                          ? 'text-slate-950 font-extrabold underline decoration-slate-800 underline-offset-2'
+                          : 'text-slate-700 font-semibold group-hover:text-slate-950'
+                      }`}
+                      title={step.spot?.title}
+                    >
+                      {spotTitle || step.label}
+                    </span>
+
                     {/* 모던한 제휴 쿠폰 뱃지 */}
                     {hasCoupon && (
                       <span className="mt-1 px-1.5 py-0.2 bg-amber-50 text-amber-700 border border-amber-200 text-[9px] font-bold rounded-full shadow-xs">
-                        쿠폰
+                        {step.spot?.partnerBenefit?.discountRate || '쿠폰'}
                       </span>
                     )}
                   </div>
