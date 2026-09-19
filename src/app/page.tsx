@@ -348,27 +348,29 @@ export default function Home() {
         onOpenProfile={() => setIsProfileModalOpen(true)}
       />
 
-      {/* 2. 인터랙티브 지도 / 흐름도 (수평 선 위의 4단계 동선 + 캐릭터 위치 표시) */}
-      <MapContainer
-        mode={currentMode === 'WORK' ? 'WORK' : 'WALK'}
-        selectedHub={selectedHub}
-        workspaces={workspaces}
-        selectedWorkspace={selectedWorkspace}
-        onSelectWorkspace={(ws) => {
-          setSelectedWorkspace(ws);
-          setCurrentMode('WORK');
-          earnPoints(50, `[${ws.name}] 워크스페이스 체크인`);
-        }}
-        activeCourse={activeCourse}
-        selectedSpot={selectedSpot}
-        onSelectSpot={setSelectedSpot}
-        onOpenBenefit={() => {
-          if (activeCourse?.partnerBenefit) {
-            setActiveBenefit(activeCourse.partnerBenefit);
-          }
-        }}
-        character={character}
-      />
+      {/* 2. 인터랙티브 지도 / 흐름도 (수평 선 위의 4단계 동선 + 캐릭터 위치 표시 - 방명록 등에서는 사용자 요청에 따라 비표시) */}
+      {(currentMode === 'WORK' || currentMode === 'WALK') && (
+        <MapContainer
+          mode={currentMode === 'WORK' ? 'WORK' : 'WALK'}
+          selectedHub={selectedHub}
+          workspaces={workspaces}
+          selectedWorkspace={selectedWorkspace}
+          onSelectWorkspace={(ws) => {
+            setSelectedWorkspace(ws);
+            setCurrentMode('WORK');
+            earnPoints(50, `[${ws.name}] 워크스페이스 체크인`);
+          }}
+          activeCourse={activeCourse}
+          selectedSpot={selectedSpot}
+          onSelectSpot={setSelectedSpot}
+          onOpenBenefit={() => {
+            if (activeCourse?.partnerBenefit) {
+              setActiveBenefit(activeCourse.partnerBenefit);
+            }
+          }}
+          character={character}
+        />
+      )}
 
       {/* 3. 모드별 콘텐츠 섹션 */}
       <div className="flex-1">

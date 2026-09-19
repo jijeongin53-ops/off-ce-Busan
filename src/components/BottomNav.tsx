@@ -15,7 +15,7 @@ export default function BottomNav({ currentMode, onModeChange, couponCount }: Bo
     { mode: 'WORK', label: '워크스페이스', icon: Briefcase },
     { mode: 'WALK', label: '1시간 코스', icon: Footprints },
     { mode: 'BENEFIT', label: '상생 혜택', icon: Ticket, badge: couponCount },
-    { mode: 'MYLOG', label: '시트 방명록', icon: BookOpen },
+    { mode: 'MYLOG', label: '방명록', icon: BookOpen },
   ];
 
   return (

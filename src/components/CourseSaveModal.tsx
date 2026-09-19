@@ -104,7 +104,7 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
         <div className="flex items-center space-x-2 text-cyan-600">
           <Database className="w-5 h-5" />
           <span className="text-xs font-black uppercase tracking-wider">
-            Google Sheet 백엔드 동기화
+            실시간 방명록 동기화
           </span>
         </div>
 
@@ -112,7 +112,7 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
           오늘의 워케이션 코스 기록하기
         </h3>
         <p className="text-xs text-slate-500 mt-0.5">
-          퇴근 후 걸었던 1시간 코스와 소감을 구글 시트에 저장합니다.
+          퇴근 후 걸었던 1시간 코스와 소감을 방명록에 저장합니다.
         </p>
 
         {/* 코스 정보 박스 */}
@@ -206,7 +206,7 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
             className="w-full py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-600 text-white font-bold text-xs shadow-md shadow-cyan-500/20 flex items-center justify-center space-x-1.5 active:scale-95 disabled:opacity-50 transition-all"
           >
             <Send className="w-3.5 h-3.5" />
-            <span>{isSubmitting ? '시트 저장 중...' : '구글 스프레드시트에 저장'}</span>
+            <span>{isSubmitting ? '방명록 저장 중...' : '방명록에 저장하기'}</span>
           </button>
         </form>
       </div>
