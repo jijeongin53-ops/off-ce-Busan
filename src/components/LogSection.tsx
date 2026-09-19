@@ -126,7 +126,7 @@ export default function LogSection({ onOpenSaveModal, isFromGoogle }: LogSection
           <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div>
               <span className="font-bold text-orange-700">4. TimeAttackCourses</span>
-              <p className="text-[11px] text-slate-500">30분 타임어택 퇴근길 코스 조합 이력</p>
+              <p className="text-[11px] text-slate-500">1시간 타임어택 퇴근길 코스 조합 이력</p>
             </div>
             <span className="text-[10px] text-slate-400 font-mono">11개 열</span>
           </div>

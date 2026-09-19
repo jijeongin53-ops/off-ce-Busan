@@ -31,10 +31,14 @@ import { BUSAN_HUBS, INITIAL_WORKSPACES, SEED_COURSES, PARTNER_BENEFITS } from '
 import { LEVEL_REQUIREMENTS } from '@/lib/characterData';
 
 export default function Home() {
-  const [currentMode, setCurrentMode] = useState<AppMode>('WALK'); // 기본 모드는 30분 코스
+  const [currentMode, setCurrentMode] = useState<AppMode>('WALK'); // 기본 모드는 1시간 코스
   const [selectedHub, setSelectedHub] = useState<LocationPoint>(BUSAN_HUBS[0]); // 영도 거점
   const [offTime, setOffTime] = useState<string>('18:00');
   const [isRainy, setIsRainy] = useState<boolean>(false);
+
+  // 현재 위치 기반 추천 상태
+  const [isLocating, setIsLocating] = useState<boolean>(false);
+  const [isUsingMyLocation, setIsUsingMyLocation] = useState<boolean>(false);
 
   // 회원 정보 및 SD 캐릭터 상태
   const [currentUser, setCurrentUser] = useState<UserMember | null>(null);
@@ -51,7 +55,7 @@ export default function Home() {
   const [selectedWorkspace, setSelectedWorkspace] = useState<Workspace | null>(INITIAL_WORKSPACES[0]);
   const [isFromGoogleSheet, setIsFromGoogleSheet] = useState<boolean>(false);
 
-  // 30분 타임어택 코스 상태
+  // 1시간 타임어택 코스 상태
   const [activeCourse, setActiveCourse] = useState<TimeAttackCourse>(SEED_COURSES[0]);
   const [selectedSpot, setSelectedSpot] = useState<TourSpot | null>(SEED_COURSES[0].spots[0].spot);
   const [courseLoading, setCourseLoading] = useState<boolean>(false);
@@ -171,10 +175,45 @@ export default function Home() {
   // 거점 선택 핸들러
   const handleSelectHub = (hub: LocationPoint) => {
     setSelectedHub(hub);
+    setIsUsingMyLocation(false);
     // 해당 거점 주변 워크스페이스 선택
     const matchedWs = workspaces.find((w) => w.area.includes(hub.area.split('/')[0])) || workspaces[0];
     setSelectedWorkspace(matchedWs);
     loadTourCourse(hub, isRainy);
+  };
+
+  // 현재 위치(GPS) 기반 1시간 타임어택 코스 추천 핸들러
+  const handleUseMyLocation = () => {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
+      alert('현재 브라우저에서 위치 정보(GPS)를 지원하지 않습니다.');
+      return;
+    }
+
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+        const myHub: LocationPoint = {
+          id: 'my-location',
+          name: '내 위치 (현재지)',
+          lat,
+          lng,
+          address: '현재 감지된 GPS 위치',
+          area: '현재지',
+        };
+        setSelectedHub(myHub);
+        setIsUsingMyLocation(true);
+        loadTourCourse(myHub, isRainy);
+        setIsLocating(false);
+      },
+      (err) => {
+        console.warn('Geolocation failed, falling back to Yeongdo:', err);
+        alert('위치 권한이 거부되었거나 GPS를 수신할 수 없어 기본 영도 거점으로 안내합니다.');
+        setIsLocating(false);
+      },
+      { enableHighAccuracy: true, timeout: 8000 }
+    );
   };
 
   // 날씨 토글 핸들러
@@ -240,7 +279,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col min-h-screen pb-20">
-      {/* 1. 상단 헤더 (타이틀, 퇴근 카운트다운 타이머, 날씨 위젯, 로그인 버튼, 거점 선택기) */}
+      {/* 1. 상단 헤더 (타이틀, 퇴근 카운트다운 타이머, 날씨 위젯, 로그인 버튼, 거점 선택기 & 내 위치) */}
       <Header
         selectedHub={selectedHub}
         onSelectHub={handleSelectHub}
@@ -250,6 +289,9 @@ export default function Home() {
         onToggleWeather={handleToggleWeather}
         user={currentUser}
         onOpenLogin={() => setIsLoginModalOpen(true)}
+        onUseMyLocation={handleUseMyLocation}
+        isLocating={isLocating}
+        isUsingMyLocation={isUsingMyLocation}
       />
 
       {/* 1-1. SD 동물 캐릭터 육성 위젯 (레벨, 성장 포인트, 착용 아이템) */}
@@ -311,6 +353,9 @@ export default function Home() {
             isRainy={isRainy}
             onToggleWeather={handleToggleWeather}
             loading={courseLoading}
+            onUseMyLocation={handleUseMyLocation}
+            isLocating={isLocating}
+            isUsingMyLocation={isUsingMyLocation}
           />
         )}
 

@@ -115,9 +115,9 @@ export async function fetchDurunubiRoute(): Promise<{
       return {
         themeNm: route.themeNm || '남파랑길 (부산)',
         routeNm: route.linemsg ? route.linemsg.slice(0, 30) : '부산 해안 낭만 도보길',
-        crsDstnc: '2.4km',
-        crsTotlRqrmHour: '30분',
-        crsSummary: route.linemsg || '부산 앞바다를 바라보며 걷는 뚜벅이 힐링 걷기 코스',
+        crsDstnc: '3.5km',
+        crsTotlRqrmHour: '1시간',
+        crsSummary: route.linemsg || '부산 앞바다를 바라보며 걷는 뚜벅이 힐링 1시간 걷기 코스',
       };
     }
     return null;
@@ -168,7 +168,7 @@ export async function fetchOdiiAudioGuide(keyword?: string): Promise<{
   }
 }
 
-// 30분 타임어택 코스 자동 생성 (3대 공공데이터 API 결합: 맛집 ➔ 산책로[두루누비+오디] ➔ 숙소)
+// 1시간 타임어택 코스 자동 생성 (3대 공공데이터 API 결합: 맛집 ➔ 산책로[두루누비+오디] ➔ 숙소)
 export async function generateTimeAttackCourse(
   lat: number,
   lng: number,
@@ -198,9 +198,9 @@ export async function generateTimeAttackCourse(
     durunubiInfo: durunubiData || {
       themeNm: '두루누비 공인 남파랑길',
       routeNm: '부산 절영해안 & 흰여울 낭만 도보길',
-      crsDstnc: '2.4km',
-      crsTotlRqrmHour: '30분',
-      crsSummary: '부산 바다를 따라 걷는 30분 퇴근길 힐링 산책로',
+      crsDstnc: '3.5km',
+      crsTotlRqrmHour: '1시간',
+      crsSummary: '부산 바다를 따라 걷는 1시간 퇴근길 힐링 산책로',
     },
     audioGuide: odiiData || {
       audioTitle: `${rawWalkSpot.title} 1분 오디오 도슨트`,
@@ -215,10 +215,10 @@ export async function generateTimeAttackCourse(
 
   return {
     id: `course-${Date.now()}`,
-    title: isRainy ? '비 오는 날 감성 충전 실내 힐링 코스' : '퇴근 후 황금빛 노을 & 로컬 미식 코스',
+    title: isRainy ? '비 오는 날 1시간 감성 충전 실내 힐링 코스' : '퇴근 후 1시간 황금빛 노을 & 로컬 미식 코스',
     theme: isRainy ? '실내힐링' : '노을산책',
-    estimatedMinutes: 28,
-    totalDistanceKm: 2.1,
+    estimatedMinutes: 58,
+    totalDistanceKm: 3.5,
     partnerBenefit,
     spots: [
       { step: 1, role: '맛집', spot: foodSpot },
@@ -267,9 +267,9 @@ function getMockTourSpots(mapX: number, mapY: number, contentTypeId?: string): T
       durunubiInfo: {
         themeNm: '두루누비 공인 갈맷길 4코스',
         routeNm: '절영해안산책로 - 흰여울길 구간',
-        crsDstnc: '2.5km',
-        crsTotlRqrmHour: '30분',
-        crsSummary: '해안 절벽을 따라 파도 소리를 들으며 걷는 부산 최고의 일몰 산책로',
+        crsDstnc: '3.5km',
+        crsTotlRqrmHour: '1시간',
+        crsSummary: '해안 절벽을 따라 파도 소리를 들으며 걷는 부산 최고의 1시간 일몰 산책로',
       },
       audioGuide: {
         audioTitle: '흰여울문화마을 1분 힐링 오디오 도슨트',

@@ -80,7 +80,7 @@ export default function MapContainer({
         <div className="flex items-center space-x-1.5">
           <span className="w-2 h-2 rounded-full bg-cyan-500 animate-pulse" />
           <span className="text-xs font-bold text-slate-800">
-            {mode === 'WALK' ? '퇴근길 30분 루트 흐름도' : '추천 워크스페이스 동선'}
+            {mode === 'WALK' ? '퇴근길 1시간 루트 흐름도' : '추천 워크스페이스 동선'}
           </span>
         </div>
 

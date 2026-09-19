@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sunset, Clock, Sun, CloudRain, MapPin, Sparkles } from 'lucide-react';
+import { Sunset, Clock, Sun, CloudRain, MapPin, Sparkles, Navigation } from 'lucide-react';
 import { LocationPoint } from '@/types';
 import { BUSAN_HUBS } from '@/lib/busanData';
 
@@ -14,6 +14,9 @@ interface HeaderProps {
   onToggleWeather: () => void;
   user?: import('@/types').UserMember | null;
   onOpenLogin?: () => void;
+  onUseMyLocation?: () => void;
+  isLocating?: boolean;
+  isUsingMyLocation?: boolean;
 }
 
 export default function Header({
@@ -25,6 +28,9 @@ export default function Header({
   onToggleWeather,
   user,
   onOpenLogin,
+  onUseMyLocation,
+  isLocating,
+  isUsingMyLocation,
 }: HeaderProps) {
 
   const [timeLeftStr, setTimeLeftStr] = useState<string>('');
@@ -150,14 +156,32 @@ export default function Header({
         </div>
       </div>
 
-      {/* 부산 워케이션 거점 칩 목록 */}
+      {/* 부산 워케이션 거점 칩 목록 & 내 위치 추천 */}
       <div className="mt-2.5 flex items-center space-x-1.5 overflow-x-auto no-scrollbar py-0.5">
         <span className="text-[11px] text-slate-500 flex items-center flex-shrink-0 mr-1">
           <MapPin className="w-3 h-3 mr-0.5 text-cyan-600" />
           거점:
         </span>
+
+        {/* 내 현재 GPS 위치 버튼 */}
+        {onUseMyLocation && (
+          <button
+            onClick={onUseMyLocation}
+            disabled={isLocating}
+            className={`flex-shrink-0 px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center space-x-1 ${
+              isUsingMyLocation
+                ? 'bg-cyan-500 text-white shadow-md shadow-cyan-500/20 ring-2 ring-cyan-300'
+                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+            }`}
+            title="현재 내 GPS 위치 기반으로 주변 1시간 코스 추천"
+          >
+            <Navigation className={`w-3 h-3 ${isLocating ? 'animate-spin text-cyan-500' : ''}`} />
+            <span>{isLocating ? '위치 감지...' : '내 위치'}</span>
+          </button>
+        )}
+
         {BUSAN_HUBS.map((hub) => {
-          const isSelected = selectedHub.id === hub.id;
+          const isSelected = !isUsingMyLocation && selectedHub.id === hub.id;
           return (
             <button
               key={hub.id}

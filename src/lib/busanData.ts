@@ -239,14 +239,14 @@ export const PARTNER_BENEFITS: PartnerBenefit[] = [
   },
 ];
 
-// 30분 타임어택 추천 기본 코스 (원도심 영도/초량 중심)
+// 1시간 타임어택 추천 기본 코스 (원도심 영도/초량 중심)
 export const SEED_COURSES: TimeAttackCourse[] = [
   {
     id: 'course-yeongdo-sunset',
-    title: '영도 해안절벽 노을 & 어묵 피크닉 코스',
+    title: '영도 해안절벽 노을 & 어묵 피크닉 1시간 코스',
     theme: '노을산책',
-    estimatedMinutes: 28,
-    totalDistanceKm: 2.4,
+    estimatedMinutes: 58,
+    totalDistanceKm: 3.6,
     partnerBenefit: PARTNER_BENEFITS[0], // 삼진어묵 15% 할인 연계
     spots: [
       {
@@ -303,10 +303,10 @@ export const SEED_COURSES: TimeAttackCourse[] = [
   },
   {
     id: 'course-choryang-ibagu',
-    title: '원도심 이바구길 산복도로 야경 코스',
+    title: '원도심 이바구길 산복도로 야경 1시간 코스',
     theme: '야경감성',
-    estimatedMinutes: 25,
-    totalDistanceKm: 1.8,
+    estimatedMinutes: 55,
+    totalDistanceKm: 3.2,
     partnerBenefit: PARTNER_BENEFITS[1], // 초량1941 연계
     spots: [
       {

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React from 'react';
 import { X, Sparkles, Trophy, Award, Shirt, Crown, Gift } from 'lucide-react';
@@ -167,7 +167,7 @@ export default function CharacterProfileModal({
           <p className="text-[10px] text-cyan-700 leading-relaxed">
             • 워크스페이스 체크인: <strong className="font-bold">+50P</strong><br />
             • 제휴 맛집/카페 쿠폰 발급: <strong className="font-bold">+80P</strong><br />
-            • 30분 퇴근길 코스 완주 및 저장: <strong className="font-bold">+120P</strong>
+            • 1시간 퇴근길 코스 완주 및 저장: <strong className="font-bold">+120P</strong>
           </p>
         </div>
 

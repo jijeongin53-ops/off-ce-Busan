@@ -431,7 +431,7 @@ export default function LoginModal({ isOpen, onClose, onLoginSuccess }: LoginMod
                 <strong className="text-slate-800">제1조 (개인정보의 수집 및 이용 목적)</strong>
                 <ul className="list-disc list-inside mt-0.5 space-y-0.5 pl-1">
                   <li>오프스 부산 워케이션 거점 체크인 확인 및 멤버십 관리</li>
-                  <li>30분 퇴근길 맞춤형 도보/관광 코스 라우팅 및 주변 명소 추천</li>
+                  <li>1시간 퇴근길 맞춤형 도보/관광 코스 라우팅 및 주변 명소 추천</li>
                   <li>SD 동물 캐릭터 파트너 육성, 레벨업 및 워케이션 활동 포인트 적립 관리</li>
                   <li>부산 로컬 제휴업체 상생 할인 모바일 바우처 발급 및 현장 본인 식별</li>
                 </ul>

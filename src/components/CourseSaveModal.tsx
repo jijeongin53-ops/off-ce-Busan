@@ -36,7 +36,7 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
           type: 'review',
           userName,
           workspaceName: workspace?.name || '부산 워크스페이스',
-          visitedCourseTitle: course?.title || '30분 타임어택 코스',
+          visitedCourseTitle: course?.title || '1시간 타임어택 코스',
           rating,
           reviewComment: comment,
         }),
@@ -112,7 +112,7 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
           오늘의 워케이션 코스 기록하기
         </h3>
         <p className="text-xs text-slate-500 mt-0.5">
-          퇴근 후 걸었던 30분 코스와 소감을 구글 시트에 저장합니다.
+          퇴근 후 걸었던 1시간 코스와 소감을 구글 시트에 저장합니다.
         </p>
 
         {/* 코스 정보 박스 */}
@@ -126,7 +126,7 @@ export default function CourseSaveModal({ course, workspace, onClose }: CourseSa
           <div className="flex justify-between">
             <span className="text-slate-500">퇴근 코스:</span>
             <span className="font-bold text-orange-600 truncate max-w-[180px]">
-              {course?.title || '부산 30분 타임어택 코스'}
+              {course?.title || '부산 1시간 타임어택 코스'}
             </span>
           </div>
         </div>

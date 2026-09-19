@@ -8,7 +8,7 @@ export interface LocationPoint {
   lat: number;
   lng: number;
   address: string;
-  area: '영도' | '초량/동구' | '남포/중구' | '광안리' | '해운대';
+  area: '영도' | '초량/동구' | '남포/중구' | '광안리' | '해운대' | '현재지' | string;
 }
 
 // 워크스페이스 (카페, 공유오피스)

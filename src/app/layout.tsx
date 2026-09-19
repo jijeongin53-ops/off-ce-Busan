@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "오프스 부산 (Off-ce BUSAN) | 뚜벅이 워케이션 라우팅",
-  description: "낮엔 몰입의 오피스, 18시엔 낭만의 오프스. 부산 워케이션 족을 위한 30분 타임어택 퇴근길 코스 및 로컬 혜택.",
+  description: "낮엔 몰입의 오피스, 18시엔 낭만의 오프스. 부산 워케이션 족을 위한 1시간 타임어택 퇴근길 코스 및 로컬 혜택.",
   keywords: ["오프스부산", "Off-ce", "부산워케이션", "뚜벅이여행", "한국관광공사", "타임어택코스", "로컬상생"],
 };
 
